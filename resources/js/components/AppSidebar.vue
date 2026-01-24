@@ -18,6 +18,7 @@ import { BookOpen, Folder, Handshake, LayoutGrid } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 import teams from '@/routes/teams';
 
+
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',

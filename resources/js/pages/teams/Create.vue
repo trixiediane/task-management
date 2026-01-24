@@ -18,12 +18,8 @@ import Input from '@/components/ui/input/Input.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Team Management',
-        href: teams.index.url(),
-    },
-    {
         title: 'Create Team',
-        href: teams.create.url(),
+        href: teams.create().url,
     },
 ];
 
@@ -46,12 +42,6 @@ function handleSubmit() {
                     <h1 class="text-2xl font-bold text-slate-900">Create New Team</h1>
                     <p class="mt-1 text-sm text-slate-600">Add a new team to your organization</p>
                 </div>
-                <Link :href="teams.index.url()">
-                    <Button variant="outline" class="shadow-sm">
-                        <ArrowLeft class="mr-2 h-4 w-4" />
-                        Back to Teams
-                    </Button>
-                </Link>
             </div>
 
             <div class="mx-auto max-w-2xl">
@@ -83,12 +73,6 @@ function handleSubmit() {
                             </div>
 
                             <div class="flex items-center justify-end gap-3 border-t border-slate-200 pt-6">
-                                <Link :href="teams.index.url()">
-                                    <Button type="button" variant="outline" class="shadow-sm"
-                                        :disabled="form.processing">
-                                        Cancel
-                                    </Button>
-                                </Link>
                                 <Button type="submit" class="bg-teal-600 shadow-md hover:bg-teal-700 hover:shadow-lg"
                                     :disabled="form.processing || !form.name">
                                     <Plus class="mr-2 h-4 w-4" />

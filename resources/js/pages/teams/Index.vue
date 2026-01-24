@@ -9,8 +9,8 @@ import { Plus } from 'lucide-vue-next';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Team Management',
-        href: teams.index.url(),
+        title: 'Teams',
+        href: teams.index().url,
     },
 ];
 
@@ -23,12 +23,8 @@ interface User {
 interface Team {
     id: number;
     name: string;
-    created_by: number;
-    updated_by: number;
-    created_at: string;
-    updated_at: string;
-    created_by_user?: User;
-    updated_by_user?: User;
+    created_by: string;
+    updated_by: string;
 }
 
 interface Props {
@@ -66,6 +62,7 @@ const props = defineProps<Props>();
                         <TableRow class="border-b-2 border-slate-200 bg-slate-50 hover:bg-slate-50">
                             <TableHead class="h-11 px-5 font-semibold text-slate-900">Name</TableHead>
                             <TableHead class="h-11 px-5 font-semibold text-slate-900">Created By</TableHead>
+                            <TableHead class="h-11 px-5 font-semibold text-slate-900">Updated</TableHead>
                             <TableHead class="h-11 px-5 text-center font-semibold text-slate-900">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -76,9 +73,17 @@ const props = defineProps<Props>();
                                 <span class="font-medium text-slate-900">{{ team.name }}</span>
                             </TableCell>
                             <TableCell class="px-5 py-4">
-                                <span class="text-slate-700">{{ team.created_by_user?.name ?? "Unknown" }}</span>
+                                <span class="font-medium text-slate-900">
+                                    {{ team.created_by?.name ?? 'N/A' }}
+                                </span>
+                            </TableCell>
+                            <TableCell class="px-5 py-4">
+                                <span class="text-sm text-slate-600">
+                                    {{ team.updated_at ? new Date(team.updated_at).toLocaleDateString() : '-' }}
+                                </span>
                             </TableCell>
                             <TableCell class="px-5 py-4 text-center">
+                                <!-- Actions buttons here -->
                             </TableCell>
                         </TableRow>
                     </TableBody>
