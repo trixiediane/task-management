@@ -18,7 +18,9 @@ class TeamController extends Controller
 
         $users = User::get();
 
-        return Inertia::render('teams/Index', compact('teams', 'users'));
+        $teamUserAssignments = TeamUser::select('team_id', 'user_id')->get();
+
+        return Inertia::render('teams/Index', compact('teams', 'users', 'teamUserAssignments'));
     }
 
     public function create()

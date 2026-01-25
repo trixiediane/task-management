@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import teams from '@/routes/teams';
 import { useForm } from '@inertiajs/vue3';
-import { watch } from 'vue';
+import {  computed, watch } from 'vue';
 
 interface User {
     id: number;
@@ -25,10 +25,16 @@ interface Team {
     users?: User[];
 }
 
+interface TeamUserAssignment {
+    team_id: number;
+    user_id: number;
+}
+
 interface Props {
     open: boolean;
     team: Team | null;
     users: User[];
+    teamUserAssignments: TeamUserAssignment[];
 }
 
 const props = defineProps<Props>();
@@ -43,6 +49,19 @@ const form = useForm<{
 }>({
     selectedUsers: [],
     teamId: null
+});
+
+const availableUsers = computed(() => {
+    if (!props.team) return [];
+
+    return props.users.filter(user => {
+        // Check if user is assigned to any other team
+        const assignedToOtherTeam = props.teamUserAssignments.some(
+            assignment => assignment.user_id === user.id && assignment.team_id !== props.team!.id
+        );
+
+        return !assignedToOtherTeam;
+    });
 });
 
 watch(() => props.open, (isOpen) => {
@@ -78,9 +97,8 @@ function handleDialogClose() {
                         Select users to add to this team
                     </DialogDescription>
                 </DialogHeader>
-
                 <div class="max-h-[300px] space-y-3 overflow-y-auto py-4">
-                    <label v-for="user in users" :key="user.id"
+                    <label v-for="user in availableUsers" :key="user.id"
                         class="flex items-center gap-3 rounded-lg border border-slate-200 p-3 transition-all hover:border-teal-300 hover:bg-teal-50 cursor-pointer">
                         <input type="checkbox" :value="user.id" v-model="form.selectedUsers"
                             class="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500" />
@@ -89,14 +107,15 @@ function handleDialogClose() {
                             <p class="text-sm text-slate-500">{{ user.email }}</p>
                         </div>
                     </label>
+                    <div v-if="availableUsers.length === 0" class="py-8 text-center text-slate-500">
+                        No available users to assign
+                    </div>
                 </div>
-
                 <div class="rounded-lg bg-teal-50 p-3 mt-4">
                     <p class="text-sm text-teal-700">
                         <span class="font-semibold">{{ form.selectedUsers.length }} user(s)</span> selected
                     </p>
                 </div>
-
                 <DialogFooter class="mt-4">
                     <DialogClose as-child>
                         <Button variant="outline" type="button" @click="handleDialogClose">

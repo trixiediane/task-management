@@ -23,6 +23,11 @@ interface User {
     email: string;
 }
 
+interface TeamUserAssignment {
+    team_id: number;
+    user_id: number;
+}
+
 interface Team {
     id: number;
     name: string;
@@ -35,6 +40,7 @@ interface Team {
 interface Props {
     teams: Team[];
     users: User[];
+    teamUserAssignments: TeamUserAssignment[];
 }
 
 const props = defineProps<Props>();
@@ -188,6 +194,7 @@ if (page.props.flash?.message) {
             </div>
         </div>
 
-        <AssignUsersDialog v-model:open="isDialogOpen" :team="selectedTeam" :users="props.users" @close="closeDialog" />
+        <AssignUsersDialog v-model:open="isDialogOpen" :team="selectedTeam" :users="props.users"
+            :team-user-assignments="props.teamUserAssignments" @close="closeDialog" />
     </AppLayout>
 </template>
