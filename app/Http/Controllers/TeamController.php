@@ -1,8 +1,8 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Team;
-use App\Models\TeamUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,15 +12,47 @@ class TeamController extends Controller
 {
     public function index()
     {
-        $teams = Team::with('createdBy', 'updatedBy', 'users')
+        $teams = Team::with([
+            'createdBy:id,name',
+            'users:id'
+        ])
+            ->select('id', 'name', 'created_by', 'updated_at')
             ->latest()
-            ->get();
+            ->paginate(10);
 
-        $users = User::get();
+        $users = User::select('id', 'name', 'email')
+            ->orderBy('name')
+            ->paginate(20);
 
-        $teamUserAssignments = TeamUser::select('team_id', 'user_id')->get();
+        return Inertia::render('teams/Index', compact('teams', 'users'));
+    }
 
-        return Inertia::render('teams/Index', compact('teams', 'users', 'teamUserAssignments'));
+    public function getTeamUsers(Team $team)
+    {
+        $assignedUserIds = $team->users()->pluck('users.id')->toArray();
+
+        $availableUsers = User::where(function ($query) use ($team) {
+            // Users walang team at all
+            $query->whereDoesntHave('teams')
+                // OR users na nasa THIS team lang (not in any other team)
+                ->orWhere(function ($q) use ($team) {
+                    $q->whereHas('teams', function ($teamQuery) use ($team) {
+                        $teamQuery->where('teams.id', $team->id);
+                    })
+                        // AND wala sa ibang team
+                        ->whereDoesntHave('teams', function ($otherTeams) use ($team) {
+                            $otherTeams->where('teams.id', '!=', $team->id);
+                        });
+                });
+        })
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
+            ->paginate(20);
+
+        return response()->json([
+            'assignedUserIds' => $assignedUserIds,
+            'users' => $availableUsers
+        ]);
     }
 
     public function create()
@@ -74,10 +106,16 @@ class TeamController extends Controller
         ]);
 
         $team = Team::findOrFail($validated['teamId']);
-
         $team->users()->sync($validated['selectedUsers'] ?? []);
 
         return redirect()->route('teams.index')
             ->with('message', 'Team members have been updated!');
+    }
+
+    public function destroy(Team $team)
+    {
+        $team->delete();
+        return redirect()->route('teams.index')
+            ->with('message', 'Team deleted successfully.');
     }
 }

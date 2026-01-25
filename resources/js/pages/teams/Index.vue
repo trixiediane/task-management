@@ -6,8 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/AppLayout.vue';
 import teams from '@/routes/teams';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/vue3';
-import { Plus, CheckCircle2, X } from 'lucide-vue-next';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Plus, CheckCircle2, X, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -23,24 +23,36 @@ interface User {
     email: string;
 }
 
-interface TeamUserAssignment {
-    team_id: number;
-    user_id: number;
-}
-
 interface Team {
     id: number;
     name: string;
-    created_by: string;
-    updated_by: string;
+    created_by: {
+        id: number;
+        name: string;
+    } | null;
     updated_at?: string;
-    users?: User[];
+    users?: { id: number }[];
+}
+
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+interface PaginatedTeams {
+    data: Team[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+    links: PaginationLink[];
 }
 
 interface Props {
-    teams: Team[];
-    users: User[];
-    teamUserAssignments: TeamUserAssignment[];
+    teams: PaginatedTeams;
 }
 
 const props = defineProps<Props>();
@@ -57,6 +69,16 @@ function openAssignDialog(team: Team) {
 
 function closeDialog() {
     isDialogOpen.value = false;
+    selectedTeam.value = null;
+}
+
+function goToPage(url: string | null) {
+    if (url) {
+        router.visit(url, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    }
 }
 
 watch(
@@ -64,9 +86,7 @@ watch(
     (flash) => {
         if (flash?.message) {
             if (alertTimeout) clearTimeout(alertTimeout);
-
             showAlert.value = false;
-
             requestAnimationFrame(() => {
                 showAlert.value = true;
                 alertTimeout = setTimeout(() => {
@@ -79,7 +99,6 @@ watch(
     { deep: true }
 );
 
-
 if (page.props.flash?.message) {
     showAlert.value = true;
     alertTimeout = setTimeout(() => {
@@ -88,6 +107,7 @@ if (page.props.flash?.message) {
     }, 5000);
 }
 </script>
+
 <template>
 
     <Head title="Team Management" />
@@ -95,7 +115,7 @@ if (page.props.flash?.message) {
         <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="translate-x-full opacity-0"
             enter-to-class="translate-x-0 opacity-100" leave-active-class="transition duration-200 ease-in"
             leave-from-class="translate-x-0 opacity-100" leave-to-class="translate-x-full opacity-0">
-            <Alert v-if="showAlert && page.props.flash?.message"
+            <Alert v-show="showAlert && page.props.flash?.message"
                 class="fixed top-4 right-4 z-50 w-96 border-green-200 bg-white text-green-800 shadow-xl">
                 <CheckCircle2 class="h-5 w-5 text-green-600" />
                 <AlertTitle class="text-green-900">Success!</AlertTitle>
@@ -139,7 +159,7 @@ if (page.props.flash?.message) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow v-for="team in props.teams" :key="team.id"
+                        <TableRow v-for="team in props.teams.data" :key="team.id"
                             class="border-b border-slate-100 transition-all hover:bg-teal-50/50">
                             <TableCell class="px-5 py-4">
                                 <span class="font-medium text-slate-900">{{ team.name }}</span>
@@ -171,7 +191,7 @@ if (page.props.flash?.message) {
                     </TableBody>
                 </Table>
 
-                <div v-if="props.teams.length === 0" class="px-5 py-12 text-center">
+                <div v-if="props.teams.data.length === 0" class="px-5 py-12 text-center">
                     <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
                         <Plus class="h-8 w-8 text-slate-400" />
                     </div>
@@ -184,17 +204,66 @@ if (page.props.flash?.message) {
                         </Button>
                     </Link>
                 </div>
+
+                <div v-if="props.teams.data.length > 0" class="border-t border-slate-200 bg-slate-50 px-5 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-slate-600">
+                            Showing
+                            <span class="font-medium text-slate-900">{{ props.teams.from }}</span>
+                            to
+                            <span class="font-medium text-slate-900">{{ props.teams.to }}</span>
+                            of
+                            <span class="font-medium text-slate-900">{{ props.teams.total }}</span>
+                            results
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <Button variant="outline" size="sm" @click="goToPage(props.teams.links[0].url)"
+                                :disabled="!props.teams.links[0].url"
+                                class="hover:bg-teal-50 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50">
+                                <ChevronLeft class="h-4 w-4" />
+                                Previous
+                            </Button>
+
+                            <div class="hidden items-center gap-1 sm:flex">
+                                <template v-for="(link, index) in props.teams.links" :key="index">
+                                    <Button v-if="index !== 0 && index !== props.teams.links.length - 1"
+                                        variant="outline" size="sm" @click="goToPage(link.url)" :disabled="!link.url"
+                                        :class="[
+                                            link.active
+                                                ? 'bg-teal-600 text-white hover:bg-teal-700'
+                                                : 'hover:bg-teal-50 hover:text-teal-700',
+                                            'min-w-[2.5rem] disabled:cursor-not-allowed disabled:opacity-50'
+                                        ]" v-html="link.label" />
+                                </template>
+                            </div>
+
+                            <div class="flex items-center gap-2 sm:hidden">
+                                <span class="text-sm text-slate-600">
+                                    Page {{ props.teams.current_page }} of {{ props.teams.last_page }}
+                                </span>
+                            </div>
+
+                            <Button variant="outline" size="sm"
+                                @click="goToPage(props.teams.links[props.teams.links.length - 1].url)"
+                                :disabled="!props.teams.links[props.teams.links.length - 1].url"
+                                class="hover:bg-teal-50 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50">
+                                Next
+                                <ChevronRight class="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="mt-4 flex items-center gap-2 rounded-lg bg-slate-50 px-4 py-3">
                 <span class="text-sm text-slate-600">Total Teams:</span>
                 <span class="rounded bg-teal-100 px-2 py-1 text-sm font-semibold text-teal-700">
-                    {{ props.teams.length }}
+                    {{ props.teams.total }}
                 </span>
             </div>
         </div>
 
-        <AssignUsersDialog v-model:open="isDialogOpen" :team="selectedTeam" :users="props.users"
-            :team-user-assignments="props.teamUserAssignments" @close="closeDialog" />
+        <AssignUsersDialog v-model:open="isDialogOpen" :team="selectedTeam" @close="closeDialog" />
     </AppLayout>
 </template>
