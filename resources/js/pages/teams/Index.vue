@@ -83,7 +83,9 @@ const props = defineProps<Props>();
                                 </span>
                             </TableCell>
                             <TableCell class="px-5 py-4 text-center">
-                                <!-- Actions buttons here -->
+                                <Link :href="teams.edit(team.id).url">
+                                    <Button>Update</Button>
+                                </Link>
                             </TableCell>
                         </TableRow>
                     </TableBody>

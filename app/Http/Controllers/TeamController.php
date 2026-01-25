@@ -38,4 +38,25 @@ class TeamController extends Controller
             ->with('message', 'Team created successfully!');
     }
 
+    public function edit(Team $team)
+    {
+        return Inertia::render('teams/Edit', compact('team'));
+    }
+
+    public function update(Request $request, Team $team)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+
+        $team->update([
+            'name' => $validated['name'],
+            'created_by' => Auth::id(),
+            'updated_by' => Auth::id()
+        ]);
+
+        return redirect()->route('teams.index')
+            ->with('message', 'Team updated successfully!');
+    }
+
 }
