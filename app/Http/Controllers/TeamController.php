@@ -2,6 +2,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Team;
+use App\Models\TeamUser;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -10,11 +12,13 @@ class TeamController extends Controller
 {
     public function index()
     {
-        $teams = Team::with('createdBy', 'updatedBy')
+        $teams = Team::with('createdBy', 'updatedBy', 'users')
             ->latest()
             ->get();
 
-        return Inertia::render('teams/Index', compact('teams'));
+        $users = User::get();
+
+        return Inertia::render('teams/Index', compact('teams', 'users'));
     }
 
     public function create()
@@ -59,4 +63,19 @@ class TeamController extends Controller
             ->with('message', 'Team updated successfully!');
     }
 
+    public function assignUsers(Request $request)
+    {
+        $validated = $request->validate([
+            'teamId' => 'required|exists:teams,id',
+            'selectedUsers' => 'array',
+            'selectedUsers.*' => 'exists:users,id'
+        ]);
+
+        $team = Team::findOrFail($validated['teamId']);
+
+        $team->users()->sync($validated['selectedUsers'] ?? []);
+
+        return redirect()->route('teams.index')
+            ->with('message', 'Team members have been updated!');
+    }
 }

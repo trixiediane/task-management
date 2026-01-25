@@ -19,6 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('teams', [TeamController::class, 'store'])->name('teams.store');
     Route::get('teams/{team}/edit', [TeamController::class, 'edit'])->name('teams.edit');
     Route::put('teams/{team}', [TeamController::class, 'update'])->name('teams.update');
+    Route::post('teams/assign-users', [TeamController::class, 'assignUsers'])
+        ->name('teams.assign-users');
 });
 
 require __DIR__ . '/settings.php';

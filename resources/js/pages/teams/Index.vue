@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AssignUsersDialog from '@/components/teams/AssignUsersDialog.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -27,26 +28,59 @@ interface Team {
     name: string;
     created_by: string;
     updated_by: string;
+    updated_at?: string;
+    users?: User[];
 }
 
 interface Props {
     teams: Team[];
+    users: User[];
 }
 
 const props = defineProps<Props>();
-
 const page = usePage();
 const showAlert = ref(false);
+const selectedTeam = ref<Team | null>(null);
+const isDialogOpen = ref(false);
+let alertTimeout: ReturnType<typeof setTimeout> | null = null;
 
-watch(() => page.props.flash?.message, (message) => {
-    if (message) {
-        showAlert.value = true;
-        setTimeout(() => (showAlert.value = false), 5000);
-    }
-},
-    { immediate: true },
+function openAssignDialog(team: Team) {
+    selectedTeam.value = team;
+    isDialogOpen.value = true;
+}
+
+function closeDialog() {
+    isDialogOpen.value = false;
+}
+
+watch(
+    () => page.props.flash,
+    (flash) => {
+        if (flash?.message) {
+            if (alertTimeout) clearTimeout(alertTimeout);
+
+            showAlert.value = false;
+
+            requestAnimationFrame(() => {
+                showAlert.value = true;
+                alertTimeout = setTimeout(() => {
+                    showAlert.value = false;
+                    alertTimeout = null;
+                }, 5000);
+            });
+        }
+    },
+    { deep: true }
 );
 
+
+if (page.props.flash?.message) {
+    showAlert.value = true;
+    alertTimeout = setTimeout(() => {
+        showAlert.value = false;
+        alertTimeout = null;
+    }, 5000);
+}
 </script>
 <template>
 
@@ -114,12 +148,18 @@ watch(() => page.props.flash?.message, (message) => {
                                     {{ team.updated_at ? new Date(team.updated_at).toLocaleDateString() : '-' }}
                                 </span>
                             </TableCell>
-                            <TableCell class="px-5 py-4 text-center">
-                                <Link :href="teams.edit(team.id).url">
-                                    <Button variant="outline" size="sm" class="hover:bg-teal-50 hover:text-teal-700">
-                                        Update
+                            <TableCell class="px-5 py-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <Link :href="teams.edit(team.id).url">
+                                        <Button variant="outline" size="sm"
+                                            class="hover:bg-teal-50 hover:text-teal-700">
+                                            Update
+                                        </Button>
+                                    </Link>
+                                    <Button variant="outline" size="sm" @click="openAssignDialog(team)">
+                                        Assign Users
                                     </Button>
-                                </Link>
+                                </div>
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -147,5 +187,7 @@ watch(() => page.props.flash?.message, (message) => {
                 </span>
             </div>
         </div>
+
+        <AssignUsersDialog v-model:open="isDialogOpen" :team="selectedTeam" :users="props.users" @close="closeDialog" />
     </AppLayout>
 </template>
