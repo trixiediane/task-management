@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
 import teams from '@/routes/teams';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/vue3';
-import { Plus } from 'lucide-vue-next';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Plus, CheckCircle2, X } from 'lucide-vue-next';
+import { ref, watch } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -32,12 +34,42 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-</script>
 
+const page = usePage();
+const showAlert = ref(false);
+
+watch(() => page.props.flash?.message, (message) => {
+    if (message) {
+        showAlert.value = true;
+        setTimeout(() => (showAlert.value = false), 5000);
+    }
+},
+    { immediate: true },
+);
+
+</script>
 <template>
 
     <Head title="Team Management" />
     <AppLayout :breadcrumbs="breadcrumbs">
+        <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="translate-x-full opacity-0"
+            enter-to-class="translate-x-0 opacity-100" leave-active-class="transition duration-200 ease-in"
+            leave-from-class="translate-x-0 opacity-100" leave-to-class="translate-x-full opacity-0">
+            <Alert v-if="showAlert && page.props.flash?.message"
+                class="fixed top-4 right-4 z-50 w-96 border-green-200 bg-white text-green-800 shadow-xl">
+                <CheckCircle2 class="h-5 w-5 text-green-600" />
+                <AlertTitle class="text-green-900">Success!</AlertTitle>
+                <AlertDescription class="text-green-700">
+                    {{ page.props.flash.message }}
+                </AlertDescription>
+                <button @click="showAlert = false"
+                    class="absolute top-2 right-2 rounded-full p-1 text-green-600 transition-colors hover:bg-green-100 hover:text-green-800"
+                    aria-label="Close notification">
+                    <X :size="16" />
+                </button>
+            </Alert>
+        </Transition>
+
         <div class="p-6">
             <div class="mb-6 flex items-center justify-between">
                 <div>
@@ -84,18 +116,35 @@ const props = defineProps<Props>();
                             </TableCell>
                             <TableCell class="px-5 py-4 text-center">
                                 <Link :href="teams.edit(team.id).url">
-                                    <Button>Update</Button>
+                                    <Button variant="outline" size="sm" class="hover:bg-teal-50 hover:text-teal-700">
+                                        Update
+                                    </Button>
                                 </Link>
                             </TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
+
+                <div v-if="props.teams.length === 0" class="px-5 py-12 text-center">
+                    <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+                        <Plus class="h-8 w-8 text-slate-400" />
+                    </div>
+                    <h3 class="mb-2 text-lg font-semibold text-slate-900">No teams yet</h3>
+                    <p class="mb-4 text-sm text-slate-600">Get started by creating your first team.</p>
+                    <Link :href="teams.create.url()">
+                        <Button class="bg-teal-600 hover:bg-teal-700">
+                            <Plus class="mr-2 h-4 w-4" />
+                            Create Your First Team
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             <div class="mt-4 flex items-center gap-2 rounded-lg bg-slate-50 px-4 py-3">
                 <span class="text-sm text-slate-600">Total Teams:</span>
-                <span class="rounded bg-teal-100 px-2 py-1 text-sm font-semibold text-teal-700">{{ props.teams.length
-                    }}</span>
+                <span class="rounded bg-teal-100 px-2 py-1 text-sm font-semibold text-teal-700">
+                    {{ props.teams.length }}
+                </span>
             </div>
         </div>
     </AppLayout>
