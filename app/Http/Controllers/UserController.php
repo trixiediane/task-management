@@ -35,4 +35,22 @@ class UserController extends Controller
         return redirect()->route('users.index')
             ->with('message', 'User created successfully!');
     }
+
+    public function update(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|unique:users,email,' . $user->id . '|email',
+            'is_active' => 'boolean'
+        ]);
+
+        $user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'is_active' => $validated['is_active']
+        ]);
+
+        return redirect()->route('users.index')
+            ->with('message', 'User updated successfully!');
+    }
 }

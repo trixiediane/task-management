@@ -29,6 +29,7 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Plus, CheckCircle2, X, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import Create from './Create.vue';
+import Edit from './Edit.vue';
 
 // pang header breadcrumbs 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -70,6 +71,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const page = usePage();
+const selectedUser = ref<User | null>(null);
 
 // flash message state 
 const showAlert = ref(false);
@@ -77,6 +79,7 @@ let alertTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // create user modal 
 const isCreateUserOpen = ref(false);
+const isUpdateUserOpen = ref(false);
 
 // pagination handler 
 function goToPage(url: string | null) {
@@ -96,6 +99,17 @@ function openCreateUser() {
 // close create modal 
 function closeCreateUser() {
     isCreateUserOpen.value = false;
+}
+
+// open create modal 
+function openUpdateUser(user: User) {
+    selectedUser.value = user;
+    isUpdateUserOpen.value = true;
+}
+
+// close create modal 
+function closeUpdateUser() {
+    isUpdateUserOpen.value = false;
 }
 
 // auto show/hide success message 
@@ -191,6 +205,9 @@ if (page.props.flash?.message) {
                         </TableCell>
                         <TableCell class="px-5 py-4">
                             <div class="flex items-center justify-center gap-2">
+                                <Button variant="outline" size="sm" @click="openUpdateUser(user)">
+                                    Update
+                                </Button>
                             </div>
                         </TableCell>
                     </TableRow>
@@ -247,6 +264,8 @@ if (page.props.flash?.message) {
                 </div>
             </div>
         </div>
+
         <Create v-model:open="isCreateUserOpen" @close="closeCreateUser" />
+        <Edit v-model:open="isUpdateUserOpen" :user="selectedUser" @close="closeUpdateUser" />
     </AppLayout>
 </template>
