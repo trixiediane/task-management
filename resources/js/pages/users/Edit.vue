@@ -16,6 +16,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
 import Input from '@/components/ui/input/Input.vue';
+import Select from '@/components/ui/select/Select.vue';
+import SelectTrigger from '@/components/ui/select/SelectTrigger.vue';
+import SelectValue from '@/components/ui/select/SelectValue.vue';
+import SelectContent from '@/components/ui/select/SelectContent.vue';
+import SelectGroup from '@/components/ui/select/SelectGroup.vue';
+import SelectLabel from '@/components/ui/select/SelectLabel.vue';
+import SelectItem from '@/components/ui/select/SelectItem.vue';
 
 interface User {
     id: number;
@@ -35,12 +42,11 @@ const emit = defineEmits<{
 }>();
 
 const isUpdating = ref(false);
-
 const form = useForm({
     id: null as number | null,
     name: '',
     email: '',
-    is_active: false,
+    is_active: '1',
 });
 
 // Populate form when user changes
@@ -49,30 +55,33 @@ watch(() => props.user, (newUser) => {
         form.id = newUser.id;
         form.name = newUser.name;
         form.email = newUser.email;
-        form.is_active = newUser.is_active;
+        form.is_active = newUser.is_active ? '1' : '0';
     }
 }, { immediate: true });
+
+function closeUpdateUser() {
+    emit('update:open', false);
+    emit('close');
+}
 
 function handleSubmit() {
     if (!props.user?.id) return;
 
     isUpdating.value = true;
 
-    form.put(users.update(props.user.id).url, {
+    form.transform((data) => ({
+        name: data.name,
+        email: data.email,
+        is_active: data.is_active === '1',
+    })).put(users.update(props.user.id).url, {
         onSuccess: () => {
-            closeDialog();
+            closeUpdateUser();
         },
         onFinish: () => {
             isUpdating.value = false;
         }
     });
 }
-
-function closeDialog() {
-    emit('update:open', false);
-    emit('close');
-}
-
 </script>
 
 <template>
@@ -111,12 +120,37 @@ function closeDialog() {
                                 {{ form.errors.email }}
                             </p>
                         </div>
+
+                        <div>
+                            <Label for="is_active" class="text-sm font-medium text-slate-700">
+                                Account Status <span class="text-red-500">*</span>
+                            </Label>
+                            <Select id="is_active" v-model="form.is_active">
+                                <SelectTrigger class="w-full">
+                                    <SelectValue placeholder="Select account status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Select Account Status</SelectLabel>
+                                        <SelectItem value="1">
+                                            Active
+                                        </SelectItem>
+                                        <SelectItem value="0">
+                                            Inactive
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <p v-if="form.errors.is_active" class="text-sm text-red-600">
+                                {{ form.errors.is_active }}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
                 <DialogFooter class="mt-4">
                     <DialogClose as-child>
-                        <Button variant="outline" type="button" @click="closeDialog">
+                        <Button variant="outline" type="button" @click="closeUpdateUser">
                             Cancel
                         </Button>
                     </DialogClose>

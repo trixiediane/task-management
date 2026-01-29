@@ -40,15 +40,11 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|unique:users,email,' . $user->id . '|email',
-            'is_active' => 'boolean'
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'is_active' => 'required|boolean',
         ]);
 
-        $user->update([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'is_active' => $validated['is_active']
-        ]);
+        $user->update($validated);
 
         return redirect()->route('users.index')
             ->with('message', 'User updated successfully!');

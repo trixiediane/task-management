@@ -22,6 +22,7 @@ class TeamController extends Controller
             ->paginate(10);
 
         $users = User::select('id', 'name', 'email')
+            ->where('is_active', 1)
             ->orderBy('name')
             ->paginate(20);
 
@@ -47,6 +48,7 @@ class TeamController extends Controller
                 });
         })
             ->select('id', 'name', 'email')
+            ->where('is_active', 1)
             ->orderBy('name')
             ->paginate(20);
 
