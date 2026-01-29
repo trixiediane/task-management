@@ -1,4 +1,15 @@
 <script setup lang="ts">
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import AssignUsersDialog from '@/components/teams/AssignUsersDialog.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -106,6 +117,15 @@ if (page.props.flash?.message) {
         alertTimeout = null;
     }, 5000);
 }
+
+const teamToDelete = ref<number | null>(null);
+
+const confirmDelete = () => {
+    if (teamToDelete.value) {
+        router.delete(teams.destroy(teamToDelete.value).url);
+        teamToDelete.value = null;
+    }
+};
 </script>
 
 <template>
@@ -185,6 +205,35 @@ if (page.props.flash?.message) {
                                     <Button variant="outline" size="sm" @click="openAssignDialog(team)">
                                         Assign Users
                                     </Button>
+                                    <!-- <Button @click="router.delete(teams.destroy(team.id).url)">Delete</Button> -->
+                                    <AlertDialog>
+                                        <AlertDialogTrigger as-child>
+                                            <Button class="bg-red-700 text-white hover:bg-red-800" @click="
+                                                teamToDelete = team.id
+                                                ">
+                                                Delete
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>
+                                                    Are you absolutely sure?
+                                                </AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This action cannot be undone.
+                                                    This will permanently delete the
+                                                    product from the database.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction @click="confirmDelete"
+                                                    class="bg-red-600 hover:bg-red-700">
+                                                    Delete
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </div>
                             </TableCell>
                         </TableRow>

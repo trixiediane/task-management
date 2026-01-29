@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Team;
+use App\Models\TeamUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -114,7 +115,10 @@ class TeamController extends Controller
 
     public function destroy(Team $team)
     {
+        $team->users()->detach();
+
         $team->delete();
+
         return redirect()->route('teams.index')
             ->with('message', 'Team deleted successfully.');
     }

@@ -15,10 +15,10 @@ class DatabaseSeeder extends Seeder
         // Call the RoleSeeder here
         $this->call([
             RoleSeeder::class,
-            TeamSeeder::class
+            // TeamSeeder::class
         ]);
 
-        User::factory(count: 10000)->create();
+        // User::factory(count: 10000)->create();
 
         User::factory()->create([
             'name' => 'Test User',
