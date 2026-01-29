@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -24,6 +25,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('teams.assign-users');
     Route::get('/teams/{team}/users', [TeamController::class, 'getTeamUsers'])->name('teams.getTeamUsers');
     Route::post('/teams/assign-users', [TeamController::class, 'assignUsers'])->name('teams.assignUsers');
+
+    Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::post('users', [UserController::class, 'store'])->name('users.store');
 });
 
 require __DIR__ . '/settings.php';

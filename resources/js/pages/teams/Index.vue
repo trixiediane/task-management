@@ -10,10 +10,19 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+
 import AssignUsersDialog from '@/components/teams/AssignUsersDialog.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+
 import AppLayout from '@/layouts/AppLayout.vue';
 import teams from '@/routes/teams';
 import { type BreadcrumbItem } from '@/types';
@@ -21,6 +30,7 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Plus, CheckCircle2, X, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
+// breadcrumbs lang para sa header 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Teams',
@@ -28,12 +38,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface User {
-    id: number;
-    name: string;
-    email: string;
-}
-
+// basic types 
 interface Team {
     id: number;
     name: string;
@@ -68,48 +73,69 @@ interface Props {
 
 const props = defineProps<Props>();
 const page = usePage();
+
+// flash message state 
 const showAlert = ref(false);
-const selectedTeam = ref<Team | null>(null);
-const isDialogOpen = ref(false);
 let alertTimeout: ReturnType<typeof setTimeout> | null = null;
 
+// assign users dialog state 
+const selectedTeam = ref<Team | null>(null);
+const isDialogOpen = ref(false);
+
+// delete confirmation 
+const teamToDelete = ref<number | null>(null);
+
+// open assign users modal 
 function openAssignDialog(team: Team) {
     selectedTeam.value = team;
     isDialogOpen.value = true;
 }
 
+// close modal + reset 
 function closeDialog() {
     isDialogOpen.value = false;
     selectedTeam.value = null;
 }
 
+// pagination handler 
 function goToPage(url: string | null) {
-    if (url) {
-        router.visit(url, {
-            preserveState: true,
-            preserveScroll: true,
-        });
-    }
+    if (!url) return;
+
+    router.visit(url, {
+        preserveState: true,
+        preserveScroll: true,
+    });
 }
 
+// actual delete after confirm 
+function confirmDelete() {
+    if (!teamToDelete.value) return;
+
+    router.delete(teams.destroy(teamToDelete.value).url);
+    teamToDelete.value = null;
+}
+
+// auto show/hide flash message 
 watch(
     () => page.props.flash,
     (flash) => {
-        if (flash?.message) {
-            if (alertTimeout) clearTimeout(alertTimeout);
-            showAlert.value = false;
-            requestAnimationFrame(() => {
-                showAlert.value = true;
-                alertTimeout = setTimeout(() => {
-                    showAlert.value = false;
-                    alertTimeout = null;
-                }, 5000);
-            });
-        }
+        if (!flash?.message) return;
+
+        if (alertTimeout) clearTimeout(alertTimeout);
+
+        showAlert.value = false;
+        requestAnimationFrame(() => {
+            showAlert.value = true;
+            alertTimeout = setTimeout(() => {
+                showAlert.value = false;
+                alertTimeout = null;
+            }, 5000);
+        });
     },
     { deep: true }
 );
 
+// pag may flash agad pag load 
 if (page.props.flash?.message) {
     showAlert.value = true;
     alertTimeout = setTimeout(() => {
@@ -117,16 +143,8 @@ if (page.props.flash?.message) {
         alertTimeout = null;
     }, 5000);
 }
-
-const teamToDelete = ref<number | null>(null);
-
-const confirmDelete = () => {
-    if (teamToDelete.value) {
-        router.delete(teams.destroy(teamToDelete.value).url);
-        teamToDelete.value = null;
-    }
-};
 </script>
+
 
 <template>
 
