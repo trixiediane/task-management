@@ -63,4 +63,17 @@ class UserController extends Controller
             ->route('users.index')
             ->with('message', 'Password updated successfully!');
     }
+    
+    public function destroy(User $user)
+    {
+        // Detach user from all teams
+        $user->teams()->detach();
+
+        // Then delete the user
+        $user->delete();
+
+        return redirect()
+            ->route('users.index')
+            ->with('message', 'User deleted successfully.');
+    }
 }
