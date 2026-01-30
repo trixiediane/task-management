@@ -49,4 +49,18 @@ class UserController extends Controller
         return redirect()->route('users.index')
             ->with('message', 'User updated successfully!');
     }
+    public function changePassword(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user->update([
+            'password' => $validated['password']
+        ]);
+
+        return redirect()
+            ->route('users.index')
+            ->with('message', 'Password updated successfully!');
+    }
 }

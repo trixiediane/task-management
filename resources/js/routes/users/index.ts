@@ -221,10 +221,100 @@ update.put = (args: { user: number | { id: number } } | [user: number | { id: nu
         })
     
     update.form = updateForm
+/**
+* @see \App\Http\Controllers\UserController::changePassword
+ * @see app/Http/Controllers/UserController.php:52
+ * @route '/users/{user}/change-password'
+ */
+export const changePassword = (args: { user: number | { id: number } } | [user: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: changePassword.url(args, options),
+    method: 'put',
+})
+
+changePassword.definition = {
+    methods: ["put"],
+    url: '/users/{user}/change-password',
+} satisfies RouteDefinition<["put"]>
+
+/**
+* @see \App\Http\Controllers\UserController::changePassword
+ * @see app/Http/Controllers/UserController.php:52
+ * @route '/users/{user}/change-password'
+ */
+changePassword.url = (args: { user: number | { id: number } } | [user: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { user: args }
+    }
+
+            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+            args = { user: args.id }
+        }
+    
+    if (Array.isArray(args)) {
+        args = {
+                    user: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        user: typeof args.user === 'object'
+                ? args.user.id
+                : args.user,
+                }
+
+    return changePassword.definition.url
+            .replace('{user}', parsedArgs.user.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\UserController::changePassword
+ * @see app/Http/Controllers/UserController.php:52
+ * @route '/users/{user}/change-password'
+ */
+changePassword.put = (args: { user: number | { id: number } } | [user: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+    url: changePassword.url(args, options),
+    method: 'put',
+})
+
+    /**
+* @see \App\Http\Controllers\UserController::changePassword
+ * @see app/Http/Controllers/UserController.php:52
+ * @route '/users/{user}/change-password'
+ */
+    const changePasswordForm = (args: { user: number | { id: number } } | [user: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: changePassword.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PUT',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\UserController::changePassword
+ * @see app/Http/Controllers/UserController.php:52
+ * @route '/users/{user}/change-password'
+ */
+        changePasswordForm.put = (args: { user: number | { id: number } } | [user: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: changePassword.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PUT',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    changePassword.form = changePasswordForm
 const users = {
     index: Object.assign(index, index),
 store: Object.assign(store, store),
 update: Object.assign(update, update),
+changePassword: Object.assign(changePassword, changePassword),
 }
 
 export default users

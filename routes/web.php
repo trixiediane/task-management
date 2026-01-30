@@ -29,6 +29,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('users', [UserController::class, 'index'])->name('users.index');
     Route::post('users', [UserController::class, 'store'])->name('users.store');
     Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::put('users/{user}/change-password', [UserController::class, 'changePassword'])
+        ->name('users.changePassword');
 });
 
 require __DIR__ . '/settings.php';

@@ -30,6 +30,7 @@ import { Plus, CheckCircle2, X, ChevronLeft, ChevronRight } from 'lucide-vue-nex
 import { ref, watch } from 'vue';
 import Create from './Create.vue';
 import Edit from './Edit.vue';
+import ChangePassword from './ChangePassword.vue';
 
 // pang header breadcrumbs 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -77,9 +78,10 @@ const selectedUser = ref<User | null>(null);
 const showAlert = ref(false);
 let alertTimeout: ReturnType<typeof setTimeout> | null = null;
 
-// create user modal 
+// manage user modals
 const isCreateUserOpen = ref(false);
 const isUpdateUserOpen = ref(false);
+const isChangePasswordOpen = ref(false);
 
 // pagination handler 
 function goToPage(url: string | null) {
@@ -101,15 +103,26 @@ function closeCreateUser() {
     isCreateUserOpen.value = false;
 }
 
-// open create modal 
+// open update modal 
 function openUpdateUser(user: User) {
     selectedUser.value = user;
     isUpdateUserOpen.value = true;
 }
 
-// close create modal 
+// close update modal 
 function closeUpdateUser() {
     isUpdateUserOpen.value = false;
+}
+
+// open change password modal 
+function openChangePassword(user: User) {
+    selectedUser.value = user;
+    isChangePasswordOpen.value = true;
+}
+
+// close change password modal 
+function closeChangePassword() {
+    isChangePasswordOpen.value = false;
 }
 
 // auto show/hide success message 
@@ -208,6 +221,9 @@ if (page.props.flash?.message) {
                                 <Button variant="outline" size="sm" @click="openUpdateUser(user)">
                                     Update
                                 </Button>
+                                <Button variant="outline" size="sm" @click="openChangePassword(user)">
+                                    Change Password
+                                </Button>
                             </div>
                         </TableCell>
                     </TableRow>
@@ -267,5 +283,6 @@ if (page.props.flash?.message) {
 
         <Create v-model:open="isCreateUserOpen" @close="closeCreateUser" />
         <Edit v-model:open="isUpdateUserOpen" :user="selectedUser" @close="closeUpdateUser" />
+        <ChangePassword v-model:open="isChangePasswordOpen" :user="selectedUser" @close="closeChangePassword" />
     </AppLayout>
 </template>
