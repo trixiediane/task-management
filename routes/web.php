@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -26,12 +27,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teams/{team}/users', [TeamController::class, 'getTeamUsers'])->name('teams.getTeamUsers');
     Route::post('/teams/assign-users', [TeamController::class, 'assignUsers'])->name('teams.assignUsers');
 
+
     Route::get('users', [UserController::class, 'index'])->name('users.index');
     Route::post('users', [UserController::class, 'store'])->name('users.store');
     Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::put('users/{user}/change-password', [UserController::class, 'changePassword'])
         ->name('users.changePassword');
     Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
 });
 
 require __DIR__ . '/settings.php';

@@ -14,6 +14,7 @@ import { useForm } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
 import Input from '@/components/ui/input/Input.vue';
+import Swal from 'sweetalert2';
 
 interface User {
     id: number;
@@ -61,6 +62,15 @@ function handleSubmit() {
     form.put(users.changePassword(props.user.id).url, {
         preserveScroll: true,
         onSuccess: () => {
+            // Optional: show success feedback
+            Swal.fire({
+                title: 'Password updated!',
+                text: 'The user password has been successfully updated.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+
             closeChangePassword();
         },
         onFinish: () => {
@@ -68,6 +78,7 @@ function handleSubmit() {
         },
     });
 }
+
 </script>
 
 <template>

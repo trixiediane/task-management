@@ -14,10 +14,11 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, Handshake, LayoutGrid, Users } from 'lucide-vue-next';
+import { BookOpen, BriefcaseBusiness, Folder, Handshake, LayoutGrid, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 import teams from '@/routes/teams';
 import users from '@/routes/users';
+import projects from '@/routes/projects';
 
 
 const mainNavItems: NavItem[] = [
@@ -35,6 +36,11 @@ const mainNavItems: NavItem[] = [
         title: 'Users',
         href: users.index(),
         icon: Users,
+    },
+    {
+        title: 'Project & Tasks',
+        href: projects.index(),
+        icon: BriefcaseBusiness,
     },
 ];
 

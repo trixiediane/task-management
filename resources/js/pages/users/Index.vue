@@ -10,8 +10,6 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
     Table,
@@ -31,6 +29,7 @@ import { ref, watch } from 'vue';
 import Create from './Create.vue';
 import Edit from './Edit.vue';
 import ChangePassword from './ChangePassword.vue';
+import Swal from 'sweetalert2';
 
 // pang header breadcrumbs 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -124,70 +123,34 @@ function openChangePassword(user: User) {
 function closeChangePassword() {
     isChangePasswordOpen.value = false;
 }
-
-// auto show/hide success message 
-watch(
-    () => page.props.flash,
-    (flash) => {
-        if (!flash?.message) return;
-
-        if (alertTimeout) clearTimeout(alertTimeout);
-
-        showAlert.value = false;
-        requestAnimationFrame(() => {
-            showAlert.value = true;
-            alertTimeout = setTimeout(() => {
-                showAlert.value = false;
-                alertTimeout = null;
-            }, 5000);
-        });
-    },
-    { deep: true }
-);
-
-// pag may flash agad on page load 
-if (page.props.flash?.message) {
-    showAlert.value = true;
-    alertTimeout = setTimeout(() => {
-        showAlert.value = false;
-        alertTimeout = null;
-    }, 5000);
-}
-
 // delete confirmation 
 const userToDelete = ref<number | null>(null);
 
-// actual delete after confirm 
 function confirmDelete() {
     if (!userToDelete.value) return;
 
-    router.delete(users.destroy(userToDelete.value).url);
-    userToDelete.value = null;
+    router.delete(users.destroy(userToDelete.value).url, {
+        onSuccess: () => {
+            // Show success Swal after deletion
+            Swal.fire({
+                title: 'Deleted!',
+                text: 'The user has been successfully deleted.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+
+            // Reset selection
+            userToDelete.value = null;
+        },
+    });
 }
 </script>
-
 
 <template>
 
     <Head title="User Management" />
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="translate-x-full opacity-0"
-            enter-to-class="translate-x-0 opacity-100" leave-active-class="transition duration-200 ease-in"
-            leave-from-class="translate-x-0 opacity-100" leave-to-class="translate-x-full opacity-0">
-            <Alert v-show="showAlert && page.props.flash?.message"
-                class="fixed top-4 right-4 z-50 w-96 border-teal-200 bg-white text-teal-800 shadow-xl">
-                <CheckCircle2 class="h-5 w-5 text-teal-600" />
-                <AlertTitle class="text-teal-900 font-semibold">Success!</AlertTitle>
-                <AlertDescription class="text-teal-700">
-                    {{ page.props.flash.message }}
-                </AlertDescription>
-                <button @click="showAlert = false"
-                    class="absolute top-2 right-2 rounded-full p-1 text-teal-600 transition-colors hover:bg-teal-100 hover:text-teal-800"
-                    aria-label="Close notification">
-                    <X :size="16" />
-                </button>
-            </Alert>
-        </Transition>
 
         <div class="p-6 bg-slate-50 min-h-screen">
             <div class="mb-8 flex items-center justify-between">

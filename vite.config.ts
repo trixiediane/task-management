@@ -24,4 +24,10 @@ export default defineConfig({
             },
         }),
     ],
+    server: {
+        host: '127.0.0.1', // Force IPv4 instead of IPv6
+        hmr: {
+            host: 'localhost',
+        },
+    },
 });

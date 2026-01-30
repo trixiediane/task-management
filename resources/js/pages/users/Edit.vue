@@ -9,10 +9,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import teams from '@/routes/teams';
 import users from '@/routes/users';
 import { router, useForm } from '@inertiajs/vue3';
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
 import Input from '@/components/ui/input/Input.vue';
@@ -23,6 +21,7 @@ import SelectContent from '@/components/ui/select/SelectContent.vue';
 import SelectGroup from '@/components/ui/select/SelectGroup.vue';
 import SelectLabel from '@/components/ui/select/SelectLabel.vue';
 import SelectItem from '@/components/ui/select/SelectItem.vue';
+import Swal from 'sweetalert2';
 
 interface User {
     id: number;
@@ -63,7 +62,6 @@ function closeUpdateUser() {
     emit('update:open', false);
     emit('close');
 }
-
 function handleSubmit() {
     if (!props.user?.id) return;
 
@@ -75,6 +73,14 @@ function handleSubmit() {
         is_active: data.is_active === '1',
     })).put(users.update(props.user.id).url, {
         onSuccess: () => {
+            Swal.fire({
+                title: 'User updated!',
+                text: 'The user has been successfully updated.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+
             closeUpdateUser();
         },
         onFinish: () => {
@@ -82,6 +88,7 @@ function handleSubmit() {
         }
     });
 }
+
 </script>
 
 <template>

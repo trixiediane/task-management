@@ -16,6 +16,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
 import Input from '@/components/ui/input/Input.vue';
+import Swal from 'sweetalert2';
+
 
 interface User {
     id: number;
@@ -43,21 +45,28 @@ const form = useForm({
     password: ''
 });
 
-function handleSubmit() {
+async function handleSubmit() {
     isCreating.value = true;
 
     form.post(users.store().url, {
         preserveScroll: true,
         onSuccess: () => {
+            Swal.fire({
+                title: 'User created!',
+                text: 'The user has been successfully added.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+
             form.reset();
-            closeDialog(); 
+            closeDialog();
         },
         onFinish: () => {
             isCreating.value = false;
         },
     });
 }
-
 
 function closeDialog() {
     emit('update:open', false);
