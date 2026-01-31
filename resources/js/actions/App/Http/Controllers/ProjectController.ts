@@ -1,7 +1,7 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\ProjectController::index
- * @see app/Http/Controllers/ProjectController.php:11
+ * @see app/Http/Controllers/ProjectController.php:12
  * @route '/projects'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\ProjectController::index
- * @see app/Http/Controllers/ProjectController.php:11
+ * @see app/Http/Controllers/ProjectController.php:12
  * @route '/projects'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ProjectController::index
- * @see app/Http/Controllers/ProjectController.php:11
+ * @see app/Http/Controllers/ProjectController.php:12
  * @route '/projects'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\ProjectController::index
- * @see app/Http/Controllers/ProjectController.php:11
+ * @see app/Http/Controllers/ProjectController.php:12
  * @route '/projects'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -42,41 +42,39 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\ProjectController::index
- * @see app/Http/Controllers/ProjectController.php:11
+/**
+* @see \App\Http\Controllers\ProjectController::store
+ * @see app/Http/Controllers/ProjectController.php:29
  * @route '/projects'
  */
-    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(options),
-        method: 'get',
-    })
+export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: store.url(options),
+    method: 'post',
+})
 
-            /**
-* @see \App\Http\Controllers\ProjectController::index
- * @see app/Http/Controllers/ProjectController.php:11
+store.definition = {
+    methods: ["post"],
+    url: '/projects',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\ProjectController::store
+ * @see app/Http/Controllers/ProjectController.php:29
  * @route '/projects'
  */
-        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\ProjectController::index
- * @see app/Http/Controllers/ProjectController.php:11
+store.url = (options?: RouteQueryOptions) => {
+    return store.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\ProjectController::store
+ * @see app/Http/Controllers/ProjectController.php:29
  * @route '/projects'
  */
-        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
-const ProjectController = { index }
+store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: store.url(options),
+    method: 'post',
+})
+const ProjectController = { index, store }
 
 export default ProjectController
