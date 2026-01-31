@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import Create from './Create.vue';
 import Edit from './Edit.vue';
@@ -8,6 +8,7 @@ import projects from '@/routes/projects';
 import { BreadcrumbItem } from '@/types';
 import { ChevronLeft, ChevronRight, Plus, Edit as EditIcon, Calendar, Users, User, Clock } from 'lucide-vue-next';
 import Button from '@/components/ui/button/Button.vue';
+import tasks from '@/routes/tasks';
 
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
@@ -165,7 +166,7 @@ function getStatusColor(status: string) {
                                         <span class="text-xs text-slate-500 font-medium">Start:</span>
                                         <span class="text-sm text-slate-700">
                                             {{ project.start_date ? new Date(project.start_date).toLocaleDateString() :
-                                            '-' }}
+                                                '-' }}
                                         </span>
                                     </div>
                                     <div class="flex items-center gap-2 mt-1">
@@ -187,6 +188,12 @@ function getStatusColor(status: string) {
                             class="w-full bg-teal-600 text-white hover:bg-teal-700 shadow-sm font-medium transition-colors">
                             <EditIcon class="mr-2 h-4 w-4" /> Update Project
                         </Button>
+                        <Link :href="tasks.index(project).url">
+                            <Button size="sm"
+                                class="w-full bg-teal-600 text-white hover:bg-teal-700 shadow-sm font-medium transition-colors">
+                                <EditIcon class="mr-2 h-4 w-4" /> Manage Tasks
+                            </Button>
+                        </Link>
                     </div>
 
                 </div>
