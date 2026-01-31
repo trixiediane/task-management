@@ -13,7 +13,7 @@ class ProjectController extends Controller
     {
         $projects = Project::with(['owner:id,name', 'team:id,name'])
             ->orderBy('start_date', 'desc')
-            ->paginate(10);
+            ->paginate(perPage: 3);
 
         $teams = Team::select('id', 'name')
             ->orderBy('name')
@@ -50,5 +50,30 @@ class ProjectController extends Controller
         return redirect()
             ->route('projects.index')
             ->with('message', 'Project created successfully!');
+    }
+
+    public function update(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'team_id'     => 'required|exists:teams,id',
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status'      => 'nullable|in:planning,ongoing,on_hold,completed,cancelled',
+            'start_date'  => 'nullable|date',
+            'due_date'    => 'nullable|date|after_or_equal:start_date',
+        ]);
+
+        $project->update([
+            'team_id'     => $validated['team_id'],
+            'name'        => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'status'      => $validated['status'] ?? $project->status,
+            'start_date'  => $validated['start_date'] ?? $project->start_date,
+            'due_date'    => $validated['due_date'] ?? $project->due_date,
+        ]);
+
+        return redirect()
+            ->route('projects.index')
+            ->with('message', 'Project updated successfully!');
     }
 }
