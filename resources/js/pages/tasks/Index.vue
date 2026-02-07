@@ -95,8 +95,9 @@ function onDrop(event: DragEvent, statusId: number) {
     // Calculate new order (append to end)
     const newOrder = status.tasks.length;
 
+    // Use Wayfinder route helper
     router.put(
-        `/projects/${props.project.id}/tasks/${draggedTask.value.id}/status`,
+        tasks.updateStatus({ project: props.project, task: draggedTask.value }).url,
         {
             task_status_id: statusId,
             order: newOrder,
@@ -129,6 +130,11 @@ function getPriorityColor(priority: string) {
     };
     return colors[priority] || 'bg-slate-100 text-slate-700';
 }
+
+// Calculate total tasks
+const totalTasks = computed(() => {
+    return props.statuses.reduce((sum, status) => sum + status.tasks.length, 0);
+});
 </script>
 
 <template>
@@ -151,12 +157,11 @@ function getPriorityColor(priority: string) {
                 </Button>
             </div>
 
-            <!-- Kanban Board -->
-            <div class="flex gap-4 overflow-x-auto pb-4">
+            <!-- Kanban Board - Responsive Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <div
                     v-for="status in props.statuses"
                     :key="status.id"
-                    class="flex-shrink-0 w-80"
                 >
                     <!-- Status Column -->
                     <div class="bg-slate-100 rounded-lg">
@@ -253,7 +258,7 @@ function getPriorityColor(priority: string) {
                 <!-- Empty State for No Statuses -->
                 <div
                     v-if="props.statuses.length === 0"
-                    class="flex-1 flex items-center justify-center min-h-[400px]"
+                    class="col-span-full flex items-center justify-center min-h-[400px]"
                 >
                     <div class="text-center">
                         <h3 class="text-lg font-semibold text-slate-900 mb-2">No task statuses yet</h3>

@@ -7,6 +7,7 @@ import DialogHeader from '@/components/ui/dialog/DialogHeader.vue';
 import DialogTitle from '@/components/ui/dialog/DialogTitle.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { X } from 'lucide-vue-next';
+import tasks from '@/routes/tasks';
 
 interface Props {
     open: boolean;
@@ -39,20 +40,24 @@ function submit() {
     processing.value = true;
     errors.value = {};
 
-    router.post(`/projects/${props.project.id}/tasks`, form.value, {
-        preserveScroll: true,
-        onSuccess: () => {
-            resetForm();
-            emit('update:open', false);
-            emit('close');
-        },
-        onError: (err) => {
-            errors.value = err;
-        },
-        onFinish: () => {
-            processing.value = false;
-        },
-    });
+    router.post(
+        tasks.store(props.project).url,
+        form.value,
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                resetForm();
+                emit('update:open', false);
+                emit('close');
+            },
+            onError: (err) => {
+                errors.value = err;
+            },
+            onFinish: () => {
+                processing.value = false;
+            },
+        }
+    );
 }
 
 function resetForm() {
