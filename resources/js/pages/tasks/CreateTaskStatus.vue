@@ -7,6 +7,7 @@ import DialogHeader from '@/components/ui/dialog/DialogHeader.vue';
 import DialogTitle from '@/components/ui/dialog/DialogTitle.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { X } from 'lucide-vue-next';
+import taskStatuses from '@/routes/task-statuses';
 
 interface Props {
     open: boolean;
@@ -40,7 +41,8 @@ function submit() {
     processing.value = true;
     errors.value = {};
 
-    router.post(`/projects/${props.project.id}/task-statuses`, form.value, {
+    // Use Wayfinder route helper
+    router.post(taskStatuses.store(props.project).url, form.value, {
         preserveScroll: true,
         onSuccess: () => {
             resetForm();

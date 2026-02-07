@@ -7,6 +7,7 @@ import DialogHeader from '@/components/ui/dialog/DialogHeader.vue';
 import DialogTitle from '@/components/ui/dialog/DialogTitle.vue';
 import Button from '@/components/ui/button/Button.vue';
 import { X, Trash2 } from 'lucide-vue-next';
+import tasks from '@/routes/tasks';
 
 interface User {
     id: number;
@@ -62,19 +63,23 @@ function submit() {
     processing.value = true;
     errors.value = {};
 
-    router.put(`/projects/${props.project.id}/tasks/${props.task.id}`, form.value, {
-        preserveScroll: true,
-        onSuccess: () => {
-            emit('update:open', false);
-            emit('close');
-        },
-        onError: (err) => {
-            errors.value = err;
-        },
-        onFinish: () => {
-            processing.value = false;
-        },
-    });
+    router.put(
+        tasks.update({ project: props.project, task: props.task }).url,
+        form.value,
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                emit('update:open', false);
+                emit('close');
+            },
+            onError: (err) => {
+                errors.value = err;
+            },
+            onFinish: () => {
+                processing.value = false;
+            },
+        }
+    );
 }
 
 function deleteTask() {
@@ -84,16 +89,19 @@ function deleteTask() {
 
     processing.value = true;
 
-    router.delete(`/projects/${props.project.id}/tasks/${props.task.id}`, {
-        preserveScroll: true,
-        onSuccess: () => {
-            emit('update:open', false);
-            emit('close');
-        },
-        onFinish: () => {
-            processing.value = false;
-        },
-    });
+    router.delete(
+        tasks.destroy({ project: props.project, task: props.task }).url,
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                emit('update:open', false);
+                emit('close');
+            },
+            onFinish: () => {
+                processing.value = false;
+            },
+        }
+    );
 }
 
 function closeModal() {
