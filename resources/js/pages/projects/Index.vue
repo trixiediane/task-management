@@ -183,11 +183,12 @@ function getStatusColor(status: string) {
                     </div>
 
                     <!-- Card Footer -->
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100">
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 space-y-2">
                         <Button size="sm" @click="openEditProject(project)"
                             class="w-full bg-teal-600 text-white hover:bg-teal-700 shadow-sm font-medium transition-colors">
                             <EditIcon class="mr-2 h-4 w-4" /> Update Project
                         </Button>
+
                         <Link :href="tasks.index(project).url">
                             <Button size="sm"
                                 class="w-full bg-teal-600 text-white hover:bg-teal-700 shadow-sm font-medium transition-colors">
@@ -195,7 +196,6 @@ function getStatusColor(status: string) {
                             </Button>
                         </Link>
                     </div>
-
                 </div>
             </div>
 
