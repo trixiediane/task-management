@@ -9,8 +9,8 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-
 import AppLayout from '@/layouts/AppLayout.vue';
+import notifications from '@/routes/notifications';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { Bell, CheckCircle2, X, ChevronLeft, ChevronRight } from 'lucide-vue-next';
@@ -19,7 +19,7 @@ import { ref, watch } from 'vue';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Notifications',
-        href: '/notifications',
+        href: notifications.index().url,
     },
 ];
 
@@ -138,8 +138,10 @@ function typeBadgeClass(type: string) {
             <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
                 <div class="bg-gradient-to-r from-teal-600 to-teal-500 px-6 py-5">
                     <h2 class="text-lg font-semibold text-white tracking-wide">Your Notifications</h2>
-                    <p class="text-teal-100 text-sm mt-1">{{ props.notifications.total }} {{ props.notifications.total
-                        === 1 ? 'notification' : 'notifications' }} total</p>
+                    <p class="text-teal-100 text-sm mt-1">
+                        {{ props.notifications.total }}
+                        {{ props.notifications.total === 1 ? 'notification' : 'notifications' }} total
+                    </p>
                 </div>
 
                 <Table>
@@ -176,7 +178,9 @@ function typeBadgeClass(type: string) {
                             <TableCell class="px-6 py-4">
                                 <span v-if="notification.read_at" class="text-sm text-slate-500">Read</span>
                                 <span v-else
-                                    class="inline-flex items-center rounded-full bg-teal-100 px-2.5 py-0.5 text-xs font-medium text-teal-700">Unread</span>
+                                    class="inline-flex items-center rounded-full bg-teal-100 px-2.5 py-0.5 text-xs font-medium text-teal-700">
+                                    Unread
+                                </span>
                             </TableCell>
                             <TableCell class="px-6 py-4">
                                 <span class="text-sm text-slate-600">
@@ -209,7 +213,6 @@ function typeBadgeClass(type: string) {
                             <span class="font-semibold text-slate-900">{{ props.notifications.total }}</span>
                             results
                         </div>
-
                         <div class="flex items-center gap-2">
                             <Button variant="outline" size="sm" @click="goToPage(props.notifications.links[0].url)"
                                 :disabled="!props.notifications.links[0].url"
@@ -217,7 +220,6 @@ function typeBadgeClass(type: string) {
                                 <ChevronLeft class="h-4 w-4" />
                                 Previous
                             </Button>
-
                             <div class="hidden items-center gap-1 sm:flex">
                                 <template v-for="(link, index) in props.notifications.links" :key="index">
                                     <Button v-if="index !== 0 && index !== props.notifications.links.length - 1"
@@ -230,13 +232,11 @@ function typeBadgeClass(type: string) {
                                         ]" v-html="link.label" />
                                 </template>
                             </div>
-
                             <div class="flex items-center gap-2 sm:hidden">
                                 <span class="text-sm text-slate-600 font-medium">
                                     Page {{ props.notifications.current_page }} of {{ props.notifications.last_page }}
                                 </span>
                             </div>
-
                             <Button variant="outline" size="sm"
                                 @click="goToPage(props.notifications.links[props.notifications.links.length - 1].url)"
                                 :disabled="!props.notifications.links[props.notifications.links.length - 1].url"

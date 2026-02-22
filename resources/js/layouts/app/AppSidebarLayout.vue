@@ -63,17 +63,26 @@ function getIconClass(type: string) {
 }
 
 onMounted(() => {
-    const userId = page.props.auth.user.id;
-
-    window.Echo.private(`user.${userId}`)
-        .listen('UserNotification', (e: Notification) => {
-            addNotification(e);
-        });
+    try {
+        const userId = page.props.auth?.user?.id;
+        if (!userId) return;
+        window.Echo.private(`user.${userId}`)
+            .listen('UserNotification', (e: Notification) => {
+                addNotification(e);
+            });
+    } catch (error) {
+        console.warn('Echo not available:', error);
+    }
 });
 
 onUnmounted(() => {
-    const userId = page.props.auth.user.id;
-    window.Echo.leaveChannel(`user.${userId}`);
+    try {
+        const userId = page.props.auth?.user?.id;
+        if (!userId) return;
+        window.Echo.leaveChannel(`user.${userId}`);
+    } catch (error) {
+        console.warn('Echo not available:', error);
+    }
 });
 </script>
 
