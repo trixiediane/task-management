@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\TaskStatusController::store
  * @see app/Http/Controllers/TaskStatusController.php:12
@@ -57,6 +57,27 @@ store.post = (args: { project: number | { id: number } } | [project: number | { 
     method: 'post',
 })
 
+    /**
+* @see \App\Http\Controllers\TaskStatusController::store
+ * @see app/Http/Controllers/TaskStatusController.php:12
+ * @route '/projects/{project}/task-statuses'
+ */
+    const storeForm = (args: { project: number | { id: number } } | [project: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: store.url(args, options),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\TaskStatusController::store
+ * @see app/Http/Controllers/TaskStatusController.php:12
+ * @route '/projects/{project}/task-statuses'
+ */
+        storeForm.post = (args: { project: number | { id: number } } | [project: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: store.url(args, options),
+            method: 'post',
+        })
+    
+    store.form = storeForm
 /**
 * @see \App\Http\Controllers\TaskStatusController::update
  * @see app/Http/Controllers/TaskStatusController.php:30
@@ -112,6 +133,37 @@ update.put = (args: { project: number | { id: number }, taskStatus: number | { i
     method: 'put',
 })
 
+    /**
+* @see \App\Http\Controllers\TaskStatusController::update
+ * @see app/Http/Controllers/TaskStatusController.php:30
+ * @route '/projects/{project}/task-statuses/{taskStatus}'
+ */
+    const updateForm = (args: { project: number | { id: number }, taskStatus: number | { id: number } } | [project: number | { id: number }, taskStatus: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: update.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PUT',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\TaskStatusController::update
+ * @see app/Http/Controllers/TaskStatusController.php:30
+ * @route '/projects/{project}/task-statuses/{taskStatus}'
+ */
+        updateForm.put = (args: { project: number | { id: number }, taskStatus: number | { id: number } } | [project: number | { id: number }, taskStatus: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PUT',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    update.form = updateForm
 /**
 * @see \App\Http\Controllers\TaskStatusController::destroy
  * @see app/Http/Controllers/TaskStatusController.php:48
@@ -166,6 +218,38 @@ destroy.delete = (args: { project: number | { id: number }, taskStatus: number |
     url: destroy.url(args, options),
     method: 'delete',
 })
+
+    /**
+* @see \App\Http\Controllers\TaskStatusController::destroy
+ * @see app/Http/Controllers/TaskStatusController.php:48
+ * @route '/projects/{project}/task-statuses/{taskStatus}'
+ */
+    const destroyForm = (args: { project: number | { id: number }, taskStatus: number | { id: number } } | [project: number | { id: number }, taskStatus: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: destroy.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'DELETE',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\TaskStatusController::destroy
+ * @see app/Http/Controllers/TaskStatusController.php:48
+ * @route '/projects/{project}/task-statuses/{taskStatus}'
+ */
+        destroyForm.delete = (args: { project: number | { id: number }, taskStatus: number | { id: number } } | [project: number | { id: number }, taskStatus: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: destroy.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'DELETE',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    destroy.form = destroyForm
 const TaskStatusController = { store, update, destroy }
 
 export default TaskStatusController

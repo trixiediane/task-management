@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\TaskController::index
  * @see app/Http/Controllers/TaskController.php:14
@@ -66,6 +66,41 @@ index.head = (args: { project: number | { id: number } } | [project: number | { 
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\TaskController::index
+ * @see app/Http/Controllers/TaskController.php:14
+ * @route '/projects/{project}/tasks'
+ */
+    const indexForm = (args: { project: number | { id: number } } | [project: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: index.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\TaskController::index
+ * @see app/Http/Controllers/TaskController.php:14
+ * @route '/projects/{project}/tasks'
+ */
+        indexForm.get = (args: { project: number | { id: number } } | [project: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\TaskController::index
+ * @see app/Http/Controllers/TaskController.php:14
+ * @route '/projects/{project}/tasks'
+ */
+        indexForm.head = (args: { project: number | { id: number } } | [project: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    index.form = indexForm
 /**
 * @see \App\Http\Controllers\TaskController::store
  * @see app/Http/Controllers/TaskController.php:35
@@ -124,6 +159,27 @@ store.post = (args: { project: number | { id: number } } | [project: number | { 
     method: 'post',
 })
 
+    /**
+* @see \App\Http\Controllers\TaskController::store
+ * @see app/Http/Controllers/TaskController.php:35
+ * @route '/projects/{project}/tasks'
+ */
+    const storeForm = (args: { project: number | { id: number } } | [project: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: store.url(args, options),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\TaskController::store
+ * @see app/Http/Controllers/TaskController.php:35
+ * @route '/projects/{project}/tasks'
+ */
+        storeForm.post = (args: { project: number | { id: number } } | [project: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: store.url(args, options),
+            method: 'post',
+        })
+    
+    store.form = storeForm
 /**
 * @see \App\Http\Controllers\TaskController::update
  * @see app/Http/Controllers/TaskController.php:57
@@ -179,6 +235,37 @@ update.put = (args: { project: number | { id: number }, task: number | { id: num
     method: 'put',
 })
 
+    /**
+* @see \App\Http\Controllers\TaskController::update
+ * @see app/Http/Controllers/TaskController.php:57
+ * @route '/projects/{project}/tasks/{task}'
+ */
+    const updateForm = (args: { project: number | { id: number }, task: number | { id: number } } | [project: number | { id: number }, task: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: update.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PUT',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\TaskController::update
+ * @see app/Http/Controllers/TaskController.php:57
+ * @route '/projects/{project}/tasks/{task}'
+ */
+        updateForm.put = (args: { project: number | { id: number }, task: number | { id: number } } | [project: number | { id: number }, task: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PUT',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    update.form = updateForm
 /**
 * @see \App\Http\Controllers\TaskController::updateStatus
  * @see app/Http/Controllers/TaskController.php:77
@@ -234,6 +321,37 @@ updateStatus.put = (args: { project: number | { id: number }, task: number | { i
     method: 'put',
 })
 
+    /**
+* @see \App\Http\Controllers\TaskController::updateStatus
+ * @see app/Http/Controllers/TaskController.php:77
+ * @route '/projects/{project}/tasks/{task}/status'
+ */
+    const updateStatusForm = (args: { project: number | { id: number }, task: number | { id: number } } | [project: number | { id: number }, task: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: updateStatus.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PUT',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\TaskController::updateStatus
+ * @see app/Http/Controllers/TaskController.php:77
+ * @route '/projects/{project}/tasks/{task}/status'
+ */
+        updateStatusForm.put = (args: { project: number | { id: number }, task: number | { id: number } } | [project: number | { id: number }, task: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: updateStatus.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PUT',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    updateStatus.form = updateStatusForm
 /**
 * @see \App\Http\Controllers\TaskController::destroy
  * @see app/Http/Controllers/TaskController.php:100
@@ -288,6 +406,38 @@ destroy.delete = (args: { project: number | { id: number }, task: number | { id:
     url: destroy.url(args, options),
     method: 'delete',
 })
+
+    /**
+* @see \App\Http\Controllers\TaskController::destroy
+ * @see app/Http/Controllers/TaskController.php:100
+ * @route '/projects/{project}/tasks/{task}'
+ */
+    const destroyForm = (args: { project: number | { id: number }, task: number | { id: number } } | [project: number | { id: number }, task: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: destroy.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'DELETE',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\TaskController::destroy
+ * @see app/Http/Controllers/TaskController.php:100
+ * @route '/projects/{project}/tasks/{task}'
+ */
+        destroyForm.delete = (args: { project: number | { id: number }, task: number | { id: number } } | [project: number | { id: number }, task: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: destroy.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'DELETE',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    destroy.form = destroyForm
 const tasks = {
     index: Object.assign(index, index),
 store: Object.assign(store, store),

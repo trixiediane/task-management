@@ -29,8 +29,9 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Plus, CheckCircle2, X, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
+import { onMounted } from 'vue';
 
-// breadcrumbs lang para sa header 
+// breadcrumbs lang para sa header
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Teams',
@@ -38,7 +39,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// basic types 
+// basic types
 interface Team {
     id: number;
     name: string;
@@ -74,30 +75,30 @@ interface Props {
 const props = defineProps<Props>();
 const page = usePage();
 
-// flash message state 
+// flash message state
 const showAlert = ref(false);
 let alertTimeout: ReturnType<typeof setTimeout> | null = null;
 
-// assign users dialog state 
+// assign users dialog state
 const selectedTeam = ref<Team | null>(null);
 const isDialogOpen = ref(false);
 
-// delete confirmation 
+// delete confirmation
 const teamToDelete = ref<number | null>(null);
 
-// open assign users modal 
+// open assign users modal
 function openAssignDialog(team: Team) {
     selectedTeam.value = team;
     isDialogOpen.value = true;
 }
 
-// close modal + reset 
+// close modal + reset
 function closeDialog() {
     isDialogOpen.value = false;
     selectedTeam.value = null;
 }
 
-// pagination handler 
+// pagination handler
 function goToPage(url: string | null) {
     if (!url) return;
 
@@ -107,7 +108,7 @@ function goToPage(url: string | null) {
     });
 }
 
-// actual delete after confirm 
+// actual delete after confirm
 function confirmDelete() {
     if (!teamToDelete.value) return;
 
@@ -115,7 +116,7 @@ function confirmDelete() {
     teamToDelete.value = null;
 }
 
-// auto show/hide flash message 
+// auto show/hide flash message
 watch(
     () => page.props.flash,
     (flash) => {
@@ -135,7 +136,7 @@ watch(
     { deep: true }
 );
 
-// pag may flash agad pag load 
+// pag may flash agad pag load
 if (page.props.flash?.message) {
     showAlert.value = true;
     alertTimeout = setTimeout(() => {
@@ -143,6 +144,13 @@ if (page.props.flash?.message) {
         alertTimeout = null;
     }, 5000);
 }
+
+onMounted(() => {
+    window.Echo.channel('test-channel')
+        .listen('TestEvent', (e) => {
+            console.log(e.message);
+        });
+});
 </script>
 
 

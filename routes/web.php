@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\TestEvent;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskStatusController;
@@ -58,6 +59,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('projects/{project}/tasks/{task}/status', [TaskController::class, 'updateStatus'])
         ->name('tasks.update-status');
     Route::delete('projects/{project}/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+
+    Route::get('/test-event', function () {
+        event(new TestEvent("Hey what is up"));
+    });
 });
 
 require __DIR__ . '/settings.php';
