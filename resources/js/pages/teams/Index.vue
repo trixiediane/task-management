@@ -28,7 +28,7 @@ import teams from '@/routes/teams';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Plus, CheckCircle2, X, ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { onMounted } from 'vue';
 
 // breadcrumbs lang para sa header
@@ -151,6 +151,9 @@ onMounted(() => {
             console.log(e.message);
         });
 });
+
+const permissions = computed(() => page.props.auth.permissions as string[]);
+const can = (permission: string) => permissions.value.includes(permission);
 </script>
 
 
@@ -182,7 +185,7 @@ onMounted(() => {
                     <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Team Management</h1>
                     <p class="mt-2 text-slate-600">Create, organize, and manage your teams efficiently</p>
                 </div>
-                <Link :href="teams.create.url()">
+                <Link v-if="can('create team')" :href="teams.create.url()">
                     <Button
                         class="bg-teal-600 text-white shadow-sm hover:bg-teal-700 hover:shadow-md transition-all font-medium cursor-pointer">
                         <Plus class="mr-2 h-4 w-4" />
@@ -230,17 +233,18 @@ onMounted(() => {
                             </TableCell>
                             <TableCell class="px-6 py-4">
                                 <div class="flex items-center justify-center gap-2">
-                                    <Link :href="teams.edit(team.id).url">
+                                    <Link v-if="can('update team')" :href="teams.edit(team.id).url">
                                         <Button variant="outline" size="sm"
                                             class="border-teal-300 bg-white text-teal-700 hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-all font-medium cursor-pointer">
                                             Update
                                         </Button>
                                     </Link>
-                                    <Button variant="outline" size="sm" @click="openAssignDialog(team)"
+                                    <Button v-if="can('assign users')" variant="outline" size="sm"
+                                        @click="openAssignDialog(team)"
                                         class="border-slate-300 bg-white text-slate-700 hover:bg-slate-600 hover:text-white hover:border-slate-600 transition-all font-medium cursor-pointer">
                                         Assign Users
                                     </Button>
-                                    <AlertDialog>
+                                    <AlertDialog v-if="can('delete team')">
                                         <AlertDialogTrigger as-child>
                                             <Button size="sm"
                                                 class="bg-rose-600 text-white hover:bg-rose-700 shadow-sm transition-all font-medium cursor-pointer"

@@ -13,36 +13,40 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, BriefcaseBusiness, Folder, Handshake, LayoutGrid, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 import teams from '@/routes/teams';
 import users from '@/routes/users';
 import projects from '@/routes/projects';
+import { computed } from 'vue';
 
+const page = usePage();
+const permissions = computed(() => page.props.auth.permissions as string[]);
+const can = (permission: string) => permissions.value.includes(permission);
 
-const mainNavItems: NavItem[] = [
+const mainNavItems = computed<NavItem[]>(() => [
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
     },
-    {
+    ...(can('view team') ? [{
         title: 'Teams',
         href: teams.index(),
         icon: Handshake,
-    },
-    {
+    }] : []),
+    ...(can('view user') ? [{
         title: 'Users',
         href: users.index(),
         icon: Users,
-    },
-    {
+    }] : []),
+    ...(can('view project') ? [{
         title: 'Project & Tasks',
         href: projects.index(),
         icon: BriefcaseBusiness,
-    },
-];
+    }] : []),
+]);
 
 const footerNavItems: NavItem[] = [
     {

@@ -20,7 +20,7 @@ Route::get('dashboard', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // Teams - anyone authenticated can view
-    Route::get('teams', [TeamController::class, 'index'])->name('teams.index');
+    Route::get('teams', [TeamController::class, 'index'])->name('teams.index')->middleware('permission:view team');
     Route::get('teams/{team}/users', [TeamController::class, 'getTeamUsers'])->name('teams.getTeamUsers');
 
     // Teams
@@ -43,7 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('teams.assign-users');
 
     // Users
-    Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::get('users', [UserController::class, 'index'])->name('users.index')->middleware('permission:view user');
 
     Route::post('users', [UserController::class, 'store'])
         ->middleware('permission:create user')
@@ -62,7 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('users.destroy');
 
     // Projects
-    Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('projects', [ProjectController::class, 'index'])->name('projects.index')->middleware('permission:view project');
 
     Route::post('projects', [ProjectController::class, 'store'])
         ->middleware('permission:create project')

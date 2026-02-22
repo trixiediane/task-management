@@ -18,17 +18,20 @@ class RoleSeeder extends Seeder
         Role::create(['name' => 'Member']);
 
         // Optional: Create permissions
+        Permission::create(['name' => 'view team']);
         Permission::create(['name' => 'create team']);
         Permission::create(['name' => 'update team']);
         Permission::create(['name' => 'delete team']);
         Permission::create(['name' => 'assign users']);
         Permission::create(['name' => 'assign permissions']);
 
+        Permission::create(['name' => 'view user']);
         Permission::create(['name' => 'create user']);
         Permission::create(['name' => 'update user']);
         Permission::create(['name' => 'delete user']);
         Permission::create(['name' => 'change password']);
 
+        Permission::create(['name' => 'view project']);
         Permission::create(['name' => 'create project']);
         Permission::create(['name' => 'update project']);
         Permission::create(['name' => 'delete project']);

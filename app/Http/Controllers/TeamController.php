@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserNotification;
+use App\Models\Notification;
 use App\Models\Team;
 use App\Models\TeamUser;
 use App\Models\User;
@@ -109,7 +111,42 @@ class TeamController extends Controller
         ]);
 
         $team = Team::findOrFail($validated['teamId']);
-        $team->users()->sync($validated['selectedUsers'] ?? []);
+
+        $previousUserIds = $team->users()->pluck('users.id')->toArray();
+        $newUserIds = $validated['selectedUsers'] ?? [];
+
+        $team->users()->sync($newUserIds);
+
+        // Newly assigned users
+        $newlyAssignedIds = array_diff($newUserIds, $previousUserIds);
+
+        // Removed users
+        $removedIds = array_diff($previousUserIds, $newUserIds);
+
+        $newlyAssignedUsers = User::whereIn('id', $newlyAssignedIds)->get();
+        $removedUsers = User::whereIn('id', $removedIds)->get();
+
+        foreach ($newlyAssignedUsers as $user) {
+            Notification::create([
+                'user_id' => $user->id,
+                'title' => 'Team Assignment',
+                'message' => "You have been assigned to the team: {$team->name}",
+                'type' => 'info',
+            ]);
+
+            event(new UserNotification($user, "You have been assigned to the team: {$team->name}"));
+        }
+
+        foreach ($removedUsers as $user) {
+            Notification::create([
+                'user_id' => $user->id,
+                'title' => 'Team Removal',
+                'message' => "You have been removed from the team: {$team->name}",
+                'type' => 'warning',
+            ]);
+
+            event(new UserNotification($user, "You have been removed from the team: {$team->name}"));
+        }
 
         return redirect()->route('teams.index')
             ->with('message', 'Team members have been updated!');
