@@ -30,8 +30,9 @@ import Create from './Create.vue';
 import Edit from './Edit.vue';
 import ChangePassword from './ChangePassword.vue';
 import Swal from 'sweetalert2';
+import AssignPermissions from './AssignPermissions.vue';
 
-// pang header breadcrumbs 
+// pang header breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Users',
@@ -39,7 +40,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// basic types 
+// basic types
 interface User {
     id: number;
     name: string;
@@ -73,7 +74,7 @@ const props = defineProps<Props>();
 const page = usePage();
 const selectedUser = ref<User | null>(null);
 
-// flash message state 
+// flash message state
 const showAlert = ref(false);
 let alertTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -81,8 +82,9 @@ let alertTimeout: ReturnType<typeof setTimeout> | null = null;
 const isCreateUserOpen = ref(false);
 const isUpdateUserOpen = ref(false);
 const isChangePasswordOpen = ref(false);
+const isAssignPermissionsOpen = ref(false);
 
-// pagination handler 
+// pagination handler
 function goToPage(url: string | null) {
     if (!url) return;
 
@@ -92,38 +94,50 @@ function goToPage(url: string | null) {
     });
 }
 
-// open create modal 
+// open create modal
 function openCreateUser() {
     isCreateUserOpen.value = true;
 }
 
-// close create modal 
+// close create modal
 function closeCreateUser() {
     isCreateUserOpen.value = false;
 }
 
-// open update modal 
+// open update modal
 function openUpdateUser(user: User) {
     selectedUser.value = user;
     isUpdateUserOpen.value = true;
 }
 
-// close update modal 
+// close update modal
 function closeUpdateUser() {
     isUpdateUserOpen.value = false;
 }
 
-// open change password modal 
+// open change password modal
 function openChangePassword(user: User) {
     selectedUser.value = user;
     isChangePasswordOpen.value = true;
 }
 
-// close change password modal 
+// close change password modal
 function closeChangePassword() {
     isChangePasswordOpen.value = false;
 }
-// delete confirmation 
+
+// open change password modal
+function openAssignPermissions(user: User) {
+    selectedUser.value = user;
+    isAssignPermissionsOpen.value = true;
+}
+
+// close change password modal
+function closeAssignPermissions() {
+    isAssignPermissionsOpen.value = false;
+}
+
+// delete confirmation
 const userToDelete = ref<number | null>(null);
 
 function confirmDelete() {
@@ -214,6 +228,10 @@ function confirmDelete() {
                                     <Button variant="outline" size="sm" @click="openChangePassword(user)"
                                         class="border-slate-300 bg-white text-slate-700 hover:bg-slate-600 hover:text-white hover:border-slate-600 transition-all font-medium cursor-pointer">
                                         Change Password
+                                    </Button>
+                                    <Button variant="outline" size="sm" @click="openAssignPermissions(user)"
+                                        class="border-blue-300 bg-white text-blue-400 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all font-medium cursor-pointer">
+                                        Assign Permissions
                                     </Button>
 
                                     <AlertDialog>
@@ -331,5 +349,7 @@ function confirmDelete() {
         <Create v-model:open="isCreateUserOpen" @close="closeCreateUser" />
         <Edit v-model:open="isUpdateUserOpen" :user="selectedUser" @close="closeUpdateUser" />
         <ChangePassword v-model:open="isChangePasswordOpen" :user="selectedUser" @close="closeChangePassword" />
+        <AssignPermissions v-model:open="isAssignPermissionsOpen" :user="selectedUser"
+            @close="closeAssignPermissions" />
     </AppLayout>
 </template>

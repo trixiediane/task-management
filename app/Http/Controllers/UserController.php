@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
 {
@@ -63,7 +64,7 @@ class UserController extends Controller
             ->route('users.index')
             ->with('message', 'Password updated successfully!');
     }
-    
+
     public function destroy(User $user)
     {
         // Detach user from all teams
@@ -75,5 +76,30 @@ class UserController extends Controller
         return redirect()
             ->route('users.index')
             ->with('message', 'User deleted successfully.');
+    }
+
+
+    public function getPermissions(User $user)
+    {
+        $allPermissions = Permission::all();
+        $userPermissions = $user->getAllPermissions()->pluck('name');
+
+        return response()->json([
+            'all_permissions' => $allPermissions,
+            'user_permissions' => $userPermissions,
+        ]);
+    }
+
+    public function assignPermissions(Request $request, User $user)
+    {
+        $request->validate([
+            'permissions' => 'array',
+            'permissions.*' => 'string|exists:permissions,name',
+        ]);
+
+        $user->syncPermissions($request->permissions ?? []);
+
+        return redirect()->route('users.index')
+            ->with('message', 'Permissions updated successfully!');
     }
 }

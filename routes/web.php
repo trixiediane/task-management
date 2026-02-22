@@ -103,6 +103,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('permission:delete project')
         ->name('tasks.destroy');
 
+    Route::get('users/{user}/permissions', [UserController::class, 'getPermissions'])
+        ->name('users.permissions');
+    Route::post('users/{user}/assign-permissions', [UserController::class, 'assignPermissions'])
+        ->middleware('permission:assign permissions')
+        ->name('users.assign-permissions');
+
     // Test
     Route::get('/test-event', function () {
         event(new TestEvent("Hey what is up"));
