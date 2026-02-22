@@ -14,13 +14,23 @@ class RoleSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create roles
-        Role::create(['name' => 'team_owner']);
-        Role::create(['name' => 'team_member']);
+        Role::create(['name' => 'Project Manager']);
+        Role::create(['name' => 'Member']);
 
         // Optional: Create permissions
-        Permission::create(['name' => 'manage team']);
+        Permission::create(['name' => 'create team']);
+        Permission::create(['name' => 'update team']);
+        Permission::create(['name' => 'delete team']);
+        Permission::create(['name' => 'assign users']);
+        Permission::create(['name' => 'assign permissions']);
+
+        Permission::create(['name' => 'create user']);
+        Permission::create(['name' => 'update user']);
+        Permission::create(['name' => 'delete user']);
+        Permission::create(['name' => 'change password']);
+
         Permission::create(['name' => 'create project']);
-        Permission::create(['name' => 'manage tasks']);
-        Permission::create(['name' => 'assign tasks']);
+        Permission::create(['name' => 'update project']);
+        Permission::create(['name' => 'delete project']);
     }
 }

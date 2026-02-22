@@ -78,6 +78,108 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     
     index.form = indexForm
 /**
+* @see \App\Http\Controllers\TeamController::getTeamUsers
+ * @see app/Http/Controllers/TeamController.php:32
+ * @route '/teams/{team}/users'
+ */
+export const getTeamUsers = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: getTeamUsers.url(args, options),
+    method: 'get',
+})
+
+getTeamUsers.definition = {
+    methods: ["get","head"],
+    url: '/teams/{team}/users',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\TeamController::getTeamUsers
+ * @see app/Http/Controllers/TeamController.php:32
+ * @route '/teams/{team}/users'
+ */
+getTeamUsers.url = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
+    if (typeof args === 'string' || typeof args === 'number') {
+        args = { team: args }
+    }
+
+            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
+            args = { team: args.id }
+        }
+    
+    if (Array.isArray(args)) {
+        args = {
+                    team: args[0],
+                }
+    }
+
+    args = applyUrlDefaults(args)
+
+    const parsedArgs = {
+                        team: typeof args.team === 'object'
+                ? args.team.id
+                : args.team,
+                }
+
+    return getTeamUsers.definition.url
+            .replace('{team}', parsedArgs.team.toString())
+            .replace(/\/+$/, '') + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\TeamController::getTeamUsers
+ * @see app/Http/Controllers/TeamController.php:32
+ * @route '/teams/{team}/users'
+ */
+getTeamUsers.get = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: getTeamUsers.url(args, options),
+    method: 'get',
+})
+/**
+* @see \App\Http\Controllers\TeamController::getTeamUsers
+ * @see app/Http/Controllers/TeamController.php:32
+ * @route '/teams/{team}/users'
+ */
+getTeamUsers.head = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: getTeamUsers.url(args, options),
+    method: 'head',
+})
+
+    /**
+* @see \App\Http\Controllers\TeamController::getTeamUsers
+ * @see app/Http/Controllers/TeamController.php:32
+ * @route '/teams/{team}/users'
+ */
+    const getTeamUsersForm = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: getTeamUsers.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\TeamController::getTeamUsers
+ * @see app/Http/Controllers/TeamController.php:32
+ * @route '/teams/{team}/users'
+ */
+        getTeamUsersForm.get = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: getTeamUsers.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\TeamController::getTeamUsers
+ * @see app/Http/Controllers/TeamController.php:32
+ * @route '/teams/{team}/users'
+ */
+        getTeamUsersForm.head = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: getTeamUsers.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    getTeamUsers.form = getTeamUsersForm
+/**
 * @see \App\Http\Controllers\TeamController::create
  * @see app/Http/Controllers/TeamController.php:61
  * @route '/teams/create'
@@ -545,117 +647,15 @@ assignUsers.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
         })
     
     assignUsers.form = assignUsersForm
-/**
-* @see \App\Http\Controllers\TeamController::getTeamUsers
- * @see app/Http/Controllers/TeamController.php:32
- * @route '/teams/{team}/users'
- */
-export const getTeamUsers = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: getTeamUsers.url(args, options),
-    method: 'get',
-})
-
-getTeamUsers.definition = {
-    methods: ["get","head"],
-    url: '/teams/{team}/users',
-} satisfies RouteDefinition<["get","head"]>
-
-/**
-* @see \App\Http\Controllers\TeamController::getTeamUsers
- * @see app/Http/Controllers/TeamController.php:32
- * @route '/teams/{team}/users'
- */
-getTeamUsers.url = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
-    if (typeof args === 'string' || typeof args === 'number') {
-        args = { team: args }
-    }
-
-            if (typeof args === 'object' && !Array.isArray(args) && 'id' in args) {
-            args = { team: args.id }
-        }
-    
-    if (Array.isArray(args)) {
-        args = {
-                    team: args[0],
-                }
-    }
-
-    args = applyUrlDefaults(args)
-
-    const parsedArgs = {
-                        team: typeof args.team === 'object'
-                ? args.team.id
-                : args.team,
-                }
-
-    return getTeamUsers.definition.url
-            .replace('{team}', parsedArgs.team.toString())
-            .replace(/\/+$/, '') + queryParams(options)
-}
-
-/**
-* @see \App\Http\Controllers\TeamController::getTeamUsers
- * @see app/Http/Controllers/TeamController.php:32
- * @route '/teams/{team}/users'
- */
-getTeamUsers.get = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
-    url: getTeamUsers.url(args, options),
-    method: 'get',
-})
-/**
-* @see \App\Http\Controllers\TeamController::getTeamUsers
- * @see app/Http/Controllers/TeamController.php:32
- * @route '/teams/{team}/users'
- */
-getTeamUsers.head = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
-    url: getTeamUsers.url(args, options),
-    method: 'head',
-})
-
-    /**
-* @see \App\Http\Controllers\TeamController::getTeamUsers
- * @see app/Http/Controllers/TeamController.php:32
- * @route '/teams/{team}/users'
- */
-    const getTeamUsersForm = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: getTeamUsers.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\TeamController::getTeamUsers
- * @see app/Http/Controllers/TeamController.php:32
- * @route '/teams/{team}/users'
- */
-        getTeamUsersForm.get = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: getTeamUsers.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\TeamController::getTeamUsers
- * @see app/Http/Controllers/TeamController.php:32
- * @route '/teams/{team}/users'
- */
-        getTeamUsersForm.head = (args: { team: number | { id: number } } | [team: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: getTeamUsers.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    getTeamUsers.form = getTeamUsersForm
 const teams = {
     index: Object.assign(index, index),
+getTeamUsers: Object.assign(getTeamUsers, getTeamUsers),
 create: Object.assign(create, create),
 store: Object.assign(store, store),
 edit: Object.assign(edit, edit),
 update: Object.assign(update, update),
 destroy: Object.assign(destroy, destroy),
 assignUsers: Object.assign(assignUsers, assignUsers),
-getTeamUsers: Object.assign(getTeamUsers, getTeamUsers),
 }
 
 export default teams

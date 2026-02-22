@@ -1,9 +1,11 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,9 +22,12 @@ class DatabaseSeeder extends Seeder
 
         // User::factory(count: 10000)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com'
+        $user = User::create([
+            'name' => 'Diane',
+            'email' => 'diane@test.com',
+            'password' => 'test123'
         ]);
+
+        $user->givePermissionTo(Permission::all());
     }
 }
