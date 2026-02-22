@@ -9,12 +9,19 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import Select from '@/components/ui/select/Select.vue';
+import SelectTrigger from '@/components/ui/select/SelectTrigger.vue';
+import SelectValue from '@/components/ui/select/SelectValue.vue';
+import SelectContent from '@/components/ui/select/SelectContent.vue';
+import SelectGroup from '@/components/ui/select/SelectGroup.vue';
+import SelectLabel from '@/components/ui/select/SelectLabel.vue';
+import SelectItem from '@/components/ui/select/SelectItem.vue';
 import { router } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 import Swal from 'sweetalert2';
-import { assignPermissions } from '@/routes/users';
+import { assignRoles } from '@/routes/users';
 
-interface Permission {
+interface Role {
     id: number;
     name: string;
 }
@@ -22,13 +29,13 @@ interface Permission {
 interface User {
     id: number;
     name: string;
-    permissions: Permission[];
+    roles: Role[];
 }
 
 interface Props {
     open: boolean;
     user: User | null;
-    allPermissions: Permission[];
+    allRoles: Role[];
 }
 
 const props = defineProps<Props>();
@@ -37,25 +44,17 @@ const emit = defineEmits<{
     (e: 'close'): void;
 }>();
 
-const selectedPermissions = ref<string[]>([]);
+const selectedRole = ref<string>('none');
 const isSaving = ref(false);
 
 watch(
     () => props.open,
     (open) => {
         if (open && props.user) {
-            selectedPermissions.value = props.user.permissions.map(p => p.name);
+            selectedRole.value = props.user.roles[0]?.name ?? 'none';
         }
     }
 );
-
-function togglePermission(name: string) {
-    if (selectedPermissions.value.includes(name)) {
-        selectedPermissions.value = selectedPermissions.value.filter(p => p !== name);
-    } else {
-        selectedPermissions.value.push(name);
-    }
-}
 
 function closeDialog() {
     emit('update:open', false);
@@ -66,16 +65,16 @@ function handleSubmit() {
     if (!props.user?.id) return;
     isSaving.value = true;
 
-    router.post(assignPermissions(props.user.id).url, {
-        permissions: selectedPermissions.value,
+    router.post(assignRoles(props.user.id).url, {
+        roles: selectedRole.value !== 'none' ? [selectedRole.value] : [],
     }, {
         preserveScroll: true,
         preserveState: true,
         only: ['users', 'flash'],
         onSuccess: () => {
             Swal.fire({
-                title: 'Permissions updated!',
-                text: 'User permissions have been successfully updated.',
+                title: 'Role updated!',
+                text: 'User role has been successfully updated.',
                 icon: 'success',
                 timer: 2000,
                 showConfirmButton: false,
@@ -94,25 +93,30 @@ function handleSubmit() {
         <DialogContent class="sm:max-w-[500px]">
             <form @submit.prevent="handleSubmit">
                 <DialogHeader>
-                    <DialogTitle>Assign Permissions</DialogTitle>
+                    <DialogTitle>Assign Role</DialogTitle>
                     <DialogDescription>
-                        Manage individual permissions for {{ props.user?.name }}.
+                        Assign a role for {{ props.user?.name }}.
                     </DialogDescription>
                 </DialogHeader>
 
                 <div class="py-4">
-                    <div class="space-y-2 max-h-80 overflow-y-auto pr-1">
-                        <label v-for="permission in props.allPermissions" :key="permission.id"
-                            class="flex items-center gap-3 rounded-lg border border-slate-200 px-4 py-3 cursor-pointer hover:bg-teal-50 hover:border-teal-300 transition-colors"
-                            :class="{ 'bg-teal-50 border-teal-300': selectedPermissions.includes(permission.name) }">
-                            <input type="checkbox" :checked="selectedPermissions.includes(permission.name)"
-                                @change="togglePermission(permission.name)"
-                                class="h-4 w-4 rounded border-slate-300 accent-teal-600 cursor-pointer" />
-                            <span class="text-sm font-medium text-slate-700 capitalize">
-                                {{ permission.name }}
-                            </span>
-                        </label>
-                    </div>
+                    <Select v-model="selectedRole">
+                        <SelectTrigger class="w-full">
+                            <SelectValue placeholder="Select a role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel>Select Role</SelectLabel>
+                                <SelectItem value="none">
+                                    -- No Role --
+                                </SelectItem>
+                                <SelectItem v-for="role in props.allRoles" :key="role.id" :value="role.name"
+                                    class="capitalize">
+                                    {{ role.name }}
+                                </SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <DialogFooter class="mt-4">
@@ -122,7 +126,7 @@ function handleSubmit() {
                         </Button>
                     </DialogClose>
                     <Button type="submit" :disabled="isSaving" class="bg-teal-600 hover:bg-teal-700">
-                        {{ isSaving ? 'Saving...' : 'Save Permissions' }}
+                        {{ isSaving ? 'Saving...' : 'Save Role' }}
                     </Button>
                 </DialogFooter>
             </form>

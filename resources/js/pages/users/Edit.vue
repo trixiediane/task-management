@@ -62,6 +62,7 @@ function closeUpdateUser() {
     emit('update:open', false);
     emit('close');
 }
+
 function handleSubmit() {
     if (!props.user?.id) return;
 
@@ -72,6 +73,9 @@ function handleSubmit() {
         email: data.email,
         is_active: data.is_active === '1',
     })).put(users.update(props.user.id).url, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['users', 'flash'],
         onSuccess: () => {
             Swal.fire({
                 title: 'User updated!',
@@ -80,7 +84,6 @@ function handleSubmit() {
                 timer: 2000,
                 showConfirmButton: false,
             });
-
             closeUpdateUser();
         },
         onFinish: () => {
@@ -88,7 +91,6 @@ function handleSubmit() {
         }
     });
 }
-
 </script>
 
 <template>

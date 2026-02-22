@@ -19,34 +19,41 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-
 import AppLayout from '@/layouts/AppLayout.vue';
 import users from '@/routes/users';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { Plus, CheckCircle2, X, ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { Head, router } from '@inertiajs/vue3';
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { ref } from 'vue';
 import Create from './Create.vue';
 import Edit from './Edit.vue';
 import ChangePassword from './ChangePassword.vue';
-import Swal from 'sweetalert2';
 import AssignPermissions from './AssignPermissions.vue';
+import AssignRoles from './AssignRoles.vue';
+import Swal from 'sweetalert2';
 
-// pang header breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Users',
-        href: users.index().url,
-    },
+    { title: 'Users', href: users.index().url },
 ];
 
-// basic types
+interface Permission {
+    id: number;
+    name: string;
+}
+
+interface Role {
+    id: number;
+    name: string;
+}
+
 interface User {
     id: number;
     name: string;
     email: string;
     is_active: boolean;
     created_at: string;
+    permissions: Permission[];
+    roles: Role[];
 }
 
 interface PaginationLink {
@@ -68,21 +75,20 @@ interface PaginatedUsers {
 
 interface Props {
     users: PaginatedUsers;
+    allPermissions: Permission[];
+    allRoles: Role[];
 }
 
 const props = defineProps<Props>();
-const page = usePage();
+
 const selectedUser = ref<User | null>(null);
-
-// flash message state
-const showAlert = ref(false);
-let alertTimeout: ReturnType<typeof setTimeout> | null = null;
-
-// manage user modals
 const isCreateUserOpen = ref(false);
 const isUpdateUserOpen = ref(false);
 const isChangePasswordOpen = ref(false);
 const isAssignPermissionsOpen = ref(false);
+const isAssignRolesOpen = ref(false);
+const userToDelete = ref<number | null>(null);
+
 
 // pagination handler
 function goToPage(url: string | null) {
@@ -126,26 +132,29 @@ function closeChangePassword() {
     isChangePasswordOpen.value = false;
 }
 
-// open change password modal
 function openAssignPermissions(user: User) {
     selectedUser.value = user;
     isAssignPermissionsOpen.value = true;
 }
 
-// close change password modal
 function closeAssignPermissions() {
     isAssignPermissionsOpen.value = false;
 }
 
-// delete confirmation
-const userToDelete = ref<number | null>(null);
+function openAssignRoles(user: User) {
+    selectedUser.value = user;
+    isAssignRolesOpen.value = true;
+}
+
+function closeAssignRoles() {
+    isAssignRolesOpen.value = false;
+}
 
 function confirmDelete() {
     if (!userToDelete.value) return;
 
     router.delete(users.destroy(userToDelete.value).url, {
         onSuccess: () => {
-            // Show success Swal after deletion
             Swal.fire({
                 title: 'Deleted!',
                 text: 'The user has been successfully deleted.',
@@ -154,7 +163,6 @@ function confirmDelete() {
                 showConfirmButton: false,
             });
 
-            // Reset selection
             userToDelete.value = null;
         },
     });
@@ -165,7 +173,6 @@ function confirmDelete() {
 
     <Head title="User Management" />
     <AppLayout :breadcrumbs="breadcrumbs">
-
         <div class="p-6 bg-slate-50 min-h-screen">
             <div class="mb-8 flex items-center justify-between">
                 <div>
@@ -231,28 +238,26 @@ function confirmDelete() {
                                     </Button>
                                     <Button variant="outline" size="sm" @click="openAssignPermissions(user)"
                                         class="border-blue-300 bg-white text-blue-400 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all font-medium cursor-pointer">
-                                        Assign Permissions
+                                        Permissions
                                     </Button>
-
+                                    <Button variant="outline" size="sm" @click="openAssignRoles(user)"
+                                        class="border-purple-300 bg-white text-purple-400 hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all font-medium cursor-pointer">
+                                        Roles
+                                    </Button>
                                     <AlertDialog>
                                         <AlertDialogTrigger as-child>
                                             <Button size="sm"
                                                 class="bg-rose-600 text-white hover:bg-rose-700 shadow-sm transition-all font-medium cursor-pointer"
-                                                @click="
-                                                    userToDelete = user.id
-                                                    ">
+                                                @click="userToDelete = user.id">
                                                 Delete
                                             </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
-                                                <AlertDialogTitle>
-                                                    Are you absolutely sure?
-                                                </AlertDialogTitle>
+                                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                    This action cannot be undone.
-                                                    This will permanently delete the
-                                                    product from the database.
+                                                    This action cannot be undone. This will permanently delete the user
+                                                    from the database.
                                                 </AlertDialogDescription>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
@@ -295,7 +300,6 @@ function confirmDelete() {
                             <span class="font-semibold text-slate-900">{{ props.users.total }}</span>
                             results
                         </div>
-
                         <div class="flex items-center gap-2">
                             <Button variant="outline" size="sm" @click="goToPage(props.users.links[0].url)"
                                 :disabled="!props.users.links[0].url"
@@ -303,7 +307,6 @@ function confirmDelete() {
                                 <ChevronLeft class="h-4 w-4" />
                                 Previous
                             </Button>
-
                             <div class="hidden items-center gap-1 sm:flex">
                                 <template v-for="(link, index) in props.users.links" :key="index">
                                     <Button v-if="index !== 0 && index !== props.users.links.length - 1"
@@ -316,13 +319,11 @@ function confirmDelete() {
                                         ]" v-html="link.label" />
                                 </template>
                             </div>
-
                             <div class="flex items-center gap-2 sm:hidden">
                                 <span class="text-sm text-slate-600 font-medium">
                                     Page {{ props.users.current_page }} of {{ props.users.last_page }}
                                 </span>
                             </div>
-
                             <Button variant="outline" size="sm"
                                 @click="goToPage(props.users.links[props.users.links.length - 1].url)"
                                 :disabled="!props.users.links[props.users.links.length - 1].url"
@@ -350,6 +351,8 @@ function confirmDelete() {
         <Edit v-model:open="isUpdateUserOpen" :user="selectedUser" @close="closeUpdateUser" />
         <ChangePassword v-model:open="isChangePasswordOpen" :user="selectedUser" @close="closeChangePassword" />
         <AssignPermissions v-model:open="isAssignPermissionsOpen" :user="selectedUser"
-            @close="closeAssignPermissions" />
+            :all-permissions="props.allPermissions" @close="closeAssignPermissions" />
+        <AssignRoles v-model:open="isAssignRolesOpen" :user="selectedUser" :all-roles="props.allRoles"
+            @close="closeAssignRoles" />
     </AppLayout>
 </template>

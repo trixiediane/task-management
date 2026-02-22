@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             'password' => 'test123'
         ]);
 
+        $user->assignRole('Project Manager');
         $user->givePermissionTo(Permission::all());
     }
 }

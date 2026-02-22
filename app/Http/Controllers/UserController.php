@@ -2,19 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\User;
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
+
     public function index()
     {
-        $users = User::paginate(10);
-        return Inertia::render('users/Index', compact('users'));
+        return Inertia::render('users/Index', [
+            'users' => User::with('permissions', 'roles')->paginate(10),
+            'allPermissions' => Permission::all(),
+            'allRoles' => Role::all(),
+        ]);
     }
 
     public function store(Request $request)
@@ -33,8 +37,7 @@ class UserController extends Controller
             'is_active' => 1
         ]);
 
-        return redirect()->route('users.index')
-            ->with('message', 'User created successfully!');
+        return back()->with('message', 'User created successfully!');
     }
 
     public function update(Request $request, User $user)
@@ -47,47 +50,26 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return redirect()->route('users.index')
-            ->with('message', 'User updated successfully!');
+        return back()->with('message', 'User updated successfully!');
     }
+
     public function changePassword(Request $request, User $user)
     {
-        $validated = $request->validate([
+        $request->validate([
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user->update([
-            'password' => $validated['password']
-        ]);
+        $user->update(['password' => $request->password]);
 
-        return redirect()
-            ->route('users.index')
-            ->with('message', 'Password updated successfully!');
+        return back()->with('message', 'Password updated successfully!');
     }
 
     public function destroy(User $user)
     {
-        // Detach user from all teams
         $user->teams()->detach();
-
-        // Then delete the user
         $user->delete();
 
-        return redirect()
-            ->route('users.index')
-            ->with('message', 'User deleted successfully.');
-    }
-
-
-    public function getPermissions(User $user)
-    {
-        $allPermissions = Permission::all();
-        $userPermissions = $user->getAllPermissions()->pluck('name');
-
-        return response()->json([
-            'all_permissions' => $allPermissions,
-            'user_permissions' => $userPermissions,
-        ]);
+        return back()->with('message', 'User deleted successfully.');
     }
 
     public function assignPermissions(Request $request, User $user)
@@ -99,7 +81,25 @@ class UserController extends Controller
 
         $user->syncPermissions($request->permissions ?? []);
 
-        return redirect()->route('users.index')
-            ->with('message', 'Permissions updated successfully!');
+        return back()->with('message', 'Permissions updated successfully!');
+    }
+
+    public function notifications()
+    {
+        $notifications = Notification::where('user_id', auth()->id())
+            ->latest()
+            ->paginate(10);
+
+        return Inertia::render('notifications/Index', compact('notifications'));
+    }
+
+    public function assignRoles(Request $request, User $user)
+    {
+        $request->validate([
+            'roles' => 'array',
+            'roles.*' => 'string|exists:roles,name',
+        ]);
+        $user->syncRoles($request->roles ?? []);
+        return back()->with('message', 'Roles updated successfully!');
     }
 }

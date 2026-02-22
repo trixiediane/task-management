@@ -50,6 +50,8 @@ async function handleSubmit() {
 
     form.post(users.store().url, {
         preserveScroll: true,
+        preserveState: true,
+        only: ['users', 'flash'],
         onSuccess: () => {
             Swal.fire({
                 title: 'User created!',
@@ -58,7 +60,6 @@ async function handleSubmit() {
                 timer: 2000,
                 showConfirmButton: false,
             });
-
             form.reset();
             closeDialog();
         },

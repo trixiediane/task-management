@@ -14,12 +14,13 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, BriefcaseBusiness, Folder, Handshake, LayoutGrid, Users } from 'lucide-vue-next';
+import { Bell, BookOpen, BriefcaseBusiness, Folder, Handshake, LayoutGrid, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 import teams from '@/routes/teams';
 import users from '@/routes/users';
 import projects from '@/routes/projects';
 import { computed } from 'vue';
+import notifications from '@/routes/notifications';
 
 const page = usePage();
 const permissions = computed(() => page.props.auth.permissions as string[]);
@@ -45,20 +46,15 @@ const mainNavItems = computed<NavItem[]>(() => [
         title: 'Project & Tasks',
         href: projects.index(),
         icon: BriefcaseBusiness,
-    }] : []),
+    }] : [])
 ]);
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Github Repo',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
+        title: 'Notifications',
+        href: notifications.index(),
+        icon: Bell,
+    }
 ];
 </script>
 
